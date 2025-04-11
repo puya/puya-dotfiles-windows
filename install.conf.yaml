@@ -1,0 +1,4 @@
+- link:
+    ~/.zshrc: .zshrc
+    ~/.tool-versions: .tool-versions
+    ~/dev-setup.md: dev-setup.md
