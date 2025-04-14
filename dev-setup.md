@@ -186,3 +186,22 @@ Then run:
 - Dev tools like Docker, PostgreSQL, Redis, etc.
 
 Let this file be your north star when setting up a new machine 💫
+
+## 🔧 Initialization Script
+
+To fully set up your environment on a new machine, run:
+
+```bash
+git clone --recursive git@github.com:puya/puya-dotfiles.git ~/dotfiles
+cd ~/dotfiles
+chmod +x init.sh
+./init.sh
+```
+
+This script will:
+- Install Homebrew (if not already installed)
+- Install core tools: `asdf`, `gh`, `git`, `curl`
+- Add `asdf` to your shell
+- Install all tools listed in `.tool-versions`
+- Install `oh-my-zsh`
+- Link all dotfiles using Dotbot
