@@ -76,3 +76,6 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="code ~/.zshrc"
 # alias ohmyzsh="code ~/.oh-my-zsh"
+
+# Added by Windsurf
+export PATH="/Users/puya/.codeium/windsurf/bin:$PATH"

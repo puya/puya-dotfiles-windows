@@ -11,7 +11,7 @@
 ## 📦 Homebrew (Package Manager)
 - Homebrew is the **macOS package manager** that installs software, libraries, CLI tools, and apps.
 - It installs to `/usr/local` (or `/opt/homebrew` on M1/M2 Macs).
-- Used to install tools like `asdf`, `git`, `wget`, `htop`, `node`, `python`, `poetry`, etc.
+- Used to install tools like `asdf`, `git`, `wget`, `htop`, etc.
 
 **Examples:**
 ```sh
@@ -42,6 +42,25 @@ plugins=(git)
 source $ZSH/oh-my-zsh.sh
 . $(brew --prefix asdf)/libexec/asdf.sh
 ```
+
+### Poetry with ASDF:
+```sh
+asdf plugin add poetry
+asdf install poetry latest # Or specific version from .tool-versions
+```
+
+### Examples of other tools to install with ASDF:
+```sh
+asdf plugin add deno
+asdf install deno latest
+asdf set deno latest
+
+asdf plugin add java
+asdf install java openjdk-17
+asdf set java openjdk-17
+```
+
+Use `asdf list all <tool>` to see all available versions.
 
 ---
 
@@ -104,7 +123,7 @@ Use `asdf list all <tool>` to see all available versions.
 ---
 
 ## 🐍 Python + Poetry
-- Python is now managed by `asdf` (not Homebrew)
+- Python and Poetry are now managed by `asdf` (not Homebrew)
 - Poetry uses the active Python version from `asdf`:
 
 ```sh
@@ -115,6 +134,10 @@ This ensures Poetry uses the ASDF-managed Python version.
 
 Each project has its own isolated environment.
 
+ASDF will auto-switch to these versions when you `cd` into the folder.
+
+Global versions are set via the `.tool-versions` file symlinked to `$HOME`.
+
 ---
 
 ## 📁 `.tool-versions` Example
@@ -123,6 +146,7 @@ This file (placed in any project directory) locks tools per project:
 python 3.13.3
 nodejs 20.11.1
 deno 1.41.0
+poetry 1.8.3 # Added poetry
 ```
 ASDF will auto-switch to these versions when you `cd` into the folder.
 
@@ -187,21 +211,22 @@ Then run:
 
 Let this file be your north star when setting up a new machine 💫
 
-## 🔧 Initialization Script
+## 🧩 Optional: Per-machine Git Signing Config
 
-To fully set up your environment on a new machine, run:
+If you're using SSH commit signing (e.g. via 1Password), we recommend keeping your signing key in a separate untracked file.
 
-```bash
-git clone --recursive git@github.com:puya/puya-dotfiles.git ~/dotfiles
-cd ~/dotfiles
-chmod +x init.sh
-./init.sh
+1. Create a `~/.gitconfig.local` file (this is ignored by Git):
+
+```ini
+[user]
+  signingkey = ssh-ed25519 AAAA...your-key
 ```
 
-This script will:
-- Install Homebrew (if not already installed)
-- Install core tools: `asdf`, `gh`, `git`, `curl`
-- Add `asdf` to your shell
-- Install all tools listed in `.tool-versions`
-- Install `oh-my-zsh`
-- Link all dotfiles using Dotbot
+2. This file is automatically included by `.gitconfig`:
+
+```ini
+[include]
+  path = ~/.gitconfig.local
+```
+
+💡 Do **not** include your full signing key in your public dotfiles — this allows per-machine control without exposing secrets.

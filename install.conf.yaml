@@ -1,7 +1,19 @@
 - link:
-    ~/.zshrc: .zshrc
-    ~/.tool-versions: .tool-versions
-    ~/dev-setup.md: dev-setup.md
-    ~/.gitconfig: .gitconfig
-    ~/Library/Application Support/Code/User/settings.json: vscode/settings.json
-    ~/Library/Application Support/Cursor/User/settings.json: cursor/settings.json
+    ~/.zshrc: 
+      path: .zshrc
+      force: true
+    ~/.tool-versions: 
+      path: .tool-versions
+      force: true
+    ~/dev-setup.md: 
+      path: dev-setup.md
+      force: true
+    ~/.gitconfig: 
+      path: .gitconfig
+      force: true
+    ~/Library/Application Support/Code/User/settings.json: 
+      path: vscode/settings.json
+      force: false
+    ~/Library/Application Support/Cursor/User/settings.json: 
+      path: cursor/settings.json
+      force: false

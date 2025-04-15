@@ -13,12 +13,12 @@ A personal collection of configuration files and setup tools for my development 
 ## 🚀 Quick setup (on a new machine)
 
 ```bash
-git clone --recursive git@github.com:puya/dotfiles.git ~/dotfiles
+git clone --recursive git@github.com:puya/puya-dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install
+./init.sh
 ```
 
-> Make sure [Homebrew](https://brew.sh/) and `asdf` are installed beforehand.
+This will install Homebrew (if missing), asdf, oh-my-zsh, gh, all configured versions, and then link all your dotfiles using Dotbot.
 
 ## 📁 Files linked to home directory
 
