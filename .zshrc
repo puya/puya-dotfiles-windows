@@ -15,7 +15,7 @@ plugins=(git)
 source $ZSH/oh-my-zsh.sh
 
 # Initialize asdf (for managing Node, Python, etc.)
-. $(brew --prefix asdf)/libexec/asdf.sh
+. "$(brew --prefix asdf)/libexec/asdf.sh"
 
 # -------------------------------
 # 📎 OPTIONAL SETTINGS & NOTES
@@ -79,3 +79,6 @@ source $ZSH/oh-my-zsh.sh
 
 # Added by Windsurf
 export PATH="/Users/puya/.codeium/windsurf/bin:$PATH"
+
+# 1Password SSH Agent Sock (ensure this is the LAST definition of this var)
+export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
