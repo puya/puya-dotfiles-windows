@@ -159,18 +159,27 @@ Global versions are set via the `.tool-versions` file symlinked to `$HOME`.
 
 ### Installed via ASDF (Recommended):
 
-1.  Ensure `uv` and your desired version (e.g., `uv 0.7.4` or `uv latest`) is listed in your `.tool-versions` file.
-    Example `.tool-versions` entry:
-    ```
-    uv 0.7.4
-    ```
-2.  The `init.sh` script, or manual setup, involves:
+The `init.sh` script handles the installation and configuration of `uv` using `asdf`. Here's how it works:
+
+1.  **Plugin Addition**:
     ```sh
     asdf plugin add uv
-    # Ensure other desired plugins for nodejs, python, poetry are also added.
-    asdf install # This command installs all tools listed in .tool-versions
     ```
-This makes `.tool-versions` the central place for defining `uv`'s version. You can update the version there and re-run `asdf install`.
+    This ensures the `uv` plugin is available to `asdf`.
+
+2.  **Installation of Latest Version**:
+    ```sh
+    asdf install uv latest
+    ```
+    This command installs the most recent version of `uv` available through the `asdf` plugin.
+
+3.  **Setting Global Version and Updating `.tool-versions`**:
+    ```sh
+    asdf set -g uv latest
+    ```
+    This command sets the just-installed latest version of `uv` as the global default. Crucially, it also **updates your global `~/.tool-versions` file** (which is symlinked from `~/dotfiles/.tool-versions`) to pin this specific latest version (e.g., `uv 0.7.5` or whatever version was fetched).
+
+This approach ensures that your development environment is always set up with the newest stable release of `uv` during the initial setup, and that version is then recorded in `.tool-versions` for consistency. If you wish to use a different specific version of `uv` later, you can manually change it in `.tool-versions` and run `asdf install`.
 
 # Alternative: Direct installation script (if not using ASDF for uv)
 # curl -LsSf https://astral.sh/uv/install.sh | sh
