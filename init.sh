@@ -12,7 +12,7 @@ else
 fi
 
 echo "🍺 Installing core packages with Homebrew..."
-brew install git gh asdf curl uv
+brew install git gh asdf curl
 
 # Add ASDF to shell if not already there
 # We'll source the final .zshrc later, which should contain this.
@@ -28,6 +28,12 @@ echo "📦 Setting up ASDF..."
 asdf plugin add python || echo "✅ Python plugin already added"
 asdf plugin add nodejs || echo "✅ NodeJS plugin already added"
 asdf plugin add poetry || echo "✅ Poetry plugin already added"
+
+echo "📦 Setting up uv with ASDF..."
+asdf plugin add uv || echo "✅ uv plugin already added or failed to add"
+asdf install uv latest || echo "⚠️  Failed to install latest uv. This might require uv to be added to .tool-versions first, or check plugin."
+asdf set -g uv latest || echo "⚠️  Failed to set global uv version with 'asdf set -g'. This would update ~/.tool-versions."
+
 asdf install || echo "⚠️  ASDF install command finished (check output for errors)."
 
 # Install Oh My Zsh (if not present)

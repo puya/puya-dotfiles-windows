@@ -53,11 +53,11 @@ asdf install poetry latest # Or specific version from .tool-versions
 ```sh
 asdf plugin add deno
 asdf install deno latest
-asdf set deno latest
+asdf set -g deno latest
 
 asdf plugin add java
 asdf install java openjdk-17
-asdf set java openjdk-17
+asdf set -g java openjdk-17
 ```
 
 Use `asdf list all <tool>` to see all available versions.
@@ -97,25 +97,25 @@ Add this to your `~/.zshrc`:
 ```sh
 asdf plugin add nodejs
 asdf install nodejs latest
-asdf set nodejs 20.11.1
+asdf set -g nodejs 20.11.1
 ```
 
 ### Python with ASDF:
 ```sh
 asdf plugin add python
 asdf install python 3.13.3
-asdf set python 3.13.3
+asdf set -g python 3.13.3
 ```
 
 ### Examples of other tools to install with ASDF:
 ```sh
 asdf plugin add deno
 asdf install deno latest
-asdf set deno latest
+asdf set -g deno latest
 
 asdf plugin add java
 asdf install java openjdk-17
-asdf set java openjdk-17
+asdf set -g java openjdk-17
 ```
 
 Use `asdf list all <tool>` to see all available versions.
@@ -142,108 +142,94 @@ Global versions are set via the `.tool-versions` file symlinked to `$HOME`.
 
 ## ⚡ `uv` (Ultra-Fast Python Tooling)
 
-- **`uv` is an extremely fast Python package installer and virtual environment manager.**
+- **`uv` is an extremely fast Python package manager and tooling suite written in Rust.**
 
-- Think of it as a high-performance replacement for many functionalities of `pip`, `venv`, and even `pipx`.
+- It serves as a comprehensive replacement for multiple Python tools:
+  - Package installation (`pip`)
+  - Virtual environment management (`virtualenv`/`venv`)
+  - Command-line tool installation (`pipx`)
+  - Python version management (like `pyenv`)
 
-- It's particularly useful for:
+- Its key advantages include:
+  - 10-100x faster than traditional Python tools
+  - Single binary with no Python dependencies
+  - Automatic virtual environment management
+  - Isolated tool installation (like `pipx`)
+  - Python version management built-in
 
-  - Rapidly installing Python CLI tools into isolated environments (e.g., MCP servers, linters).
+### Installed via ASDF (Recommended):
 
-  - Quickly creating virtual environments.
+1.  Ensure `uv` and your desired version (e.g., `uv 0.7.4` or `uv latest`) is listed in your `.tool-versions` file.
+    Example `.tool-versions` entry:
+    ```
+    uv 0.7.4
+    ```
+2.  The `init.sh` script, or manual setup, involves:
+    ```sh
+    asdf plugin add uv
+    # Ensure other desired plugins for nodejs, python, poetry are also added.
+    asdf install # This command installs all tools listed in .tool-versions
+    ```
+This makes `.tool-versions` the central place for defining `uv`'s version. You can update the version there and re-run `asdf install`.
 
-  - Speeding up `pip install` operations in contexts where Poetry isn't used.
-
-
-### Installed via:
-
-`uv` is installed via Homebrew as part of the `init.sh` script:
-
-```sh
-brew install uv
-```
-
-This makes the `uv` command globally available.
-
+# Alternative: Direct installation script (if not using ASDF for uv)
+# curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ### Key Use Cases for `uv`:
 
-1.  **Installing Global Python CLI Tools**:
+1. **Installing Global Python CLI Tools**:
 
-    - Use `uv tool install <package_name_or_git_url>` (e.g., `uv tool install ruff`, `uv tool install some-mcp-server`).
+   - Use `uv tool install <package_name>` to install tools globally but in isolated environments:
+     ```sh
+     uv tool install ruff
+     uv tool install black
+     ```
 
-    - This installs the tool and its dependencies into an isolated environment and makes the executable available on your `PATH`.
+   - Or run tools without installing them permanently:
+     ```sh
+     uvx ruff check .  # (uvx is an alias for uv tool run)
+     ```
 
-    - Ideal for tools you want to use across different projects without them interfering with project-specific dependencies.
+2. **Fast Virtual Environment Management**:
 
+   - Create: `uv venv`
+   - Activate: `source .venv/bin/activate`
 
-2.  **Fast Virtual Environment Management (outside Poetry projects)**:
+3. **Fast Package Installation**:
 
-    - Create: `uv venv`
+   - Install packages: `uv pip install <package_name>`
+   - Install from requirements: `uv pip install -r requirements.txt`
 
-    - Activate: `source .venv/bin/activate` (similar to standard venvs)
+4. **Python Version Management**:
 
-
-3.  **Fast Package Installation (outside Poetry projects or for global tools)**:
-
-    - `uv pip install <package_name>`
-
-
----
-
+   - Install Python versions: `uv python install 3.13`
+   - Use a specific version for your project: `uv python pin 3.13`
 
 ## 🆚 When to Use `Poetry` vs. `uv`
 
-
 While both tools can manage Python packages, they serve different primary purposes in this setup:
-
 
 *   **Use `Poetry` for:**
 
-    *   **Comprehensive Project Dependency Management**: When working *inside* a Python project (application or library) that has a `pyproject.toml` file.
-
-    *   **Reproducible Environments**: Defining and locking project dependencies (`poetry.lock`) for consistent builds.
-
-    *   **Managing Project-Specific Virtual Environments**: `poetry install` sets up the isolated environment for your project.
-
-    *   **Running Project Tasks**: `poetry run <command>`.
-
-    *   **Building and Publishing Packages**: `poetry build`, `poetry publish`.
-
-    *   **Primary commands**: `poetry add`, `poetry install`, `poetry update`, `poetry run`.
-
-
+    *   **Comprehensive Project Dependency Management**: When working *inside* a Python project that requires a fully featured dependency manager with lockfiles.
+    
+    *   **Reproducible Environments**: Defining and locking project dependencies for consistent builds across team members.
+    
+    *   **Managing Project-Specific Packages**: When you need fine-grained control over your project's dependencies.
 
 *   **Use `uv` for:**
 
-    *   **Installing Standalone/Global Python CLI Tools**: For tools you want to use system-wide or across multiple projects *without* adding them to each project's `pyproject.toml`.
+    *   **Installing Global Python CLI Tools**: For tools that you want to use system-wide or across multiple projects.
+    
+    *   **Quick, Isolated Environments**: When you need a fast, lightweight Python environment.
+    
+    *   **Python Version Management**: For projects that need specific Python versions.
+    
+    *   **Ultra-Fast Package Installation**: When speed is critical and you want to bypass the slower pip experience.
 
-        *   **Example**: `uv tool install ruff` (to have Ruff linter globally), `uv tool install an-mcp-server`.
-
-        *   These tools are installed in isolated environments managed by `uv`, separate from your Poetry project environments.
-
-    *   **Ad-hoc/Temporary Virtual Environments**: If you need a quick, temporary Python environment for a script or experiment *not* managed by Poetry.
-
-        *   **Example**: `uv venv` followed by `source .venv/bin/activate` and then `uv pip install some_package`.
-
-    *   **Speeding up one-off `pip install` tasks** where Poetry's full project management isn't needed.
-
-
-
-**Key Distinction:**
-
--   **Poetry** is your *project-centric* manager. It handles the lifecycle and dependencies of a specific Python package or application you are developing.
-
--   **`uv`** (in this setup, primarily `uv tool install`) is for installing and managing *external Python tools* that you use *across* projects, or for very fast, lightweight environment/package operations *outside* the context of a Poetry-managed project.
-
-
-
-**Do NOT use `uv pip install` to manage dependencies *inside* a Poetry project's activated environment, as this will bypass Poetry's dependency resolution and `poetry.lock` file, leading to inconsistencies. Always use `poetry add` for that.**
-
+**Important Note**: Don't use `brew install uv` as it will compile from source and is extremely slow on older Macs. Always use ASDF or the standalone installer script.
 
 ---
-
-
 
 ## 📁 `.tool-versions` Example
 
