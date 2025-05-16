@@ -337,3 +337,54 @@ If you're using SSH commit signing (e.g. via 1Password), we recommend keeping yo
 ```
 
 💡 Do **not** include your full signing key in your public dotfiles — this allows per-machine control without exposing secrets.
+
+---
+
+## ✍️ IMPORTANT: Setting Up Git Commit Signing (Per Machine)
+
+Your main `.gitconfig` (managed by these dotfiles) is set up to sign Git commits using an SSH key via 1Password. To make this work on each new machine, you **must** create a local configuration file (`~/.gitconfig.local`) that tells Git *which* of your SSH keys (managed by 1Password) to use for signing.
+
+**Follow these steps carefully on each machine where you use these dotfiles:**
+
+1.  **Ensure 1Password is Ready:**
+    *   Install and sign into the 1Password desktop application.
+    *   In 1Password's **Settings > Developer**, ensure **"Use the SSH Agent"** is enabled.
+    *   If prompted by 1Password, allow it to configure your SSH settings (it might offer to modify `~/.ssh/config` to use its agent).
+    *   Ensure the SSH key you want to use for signing is loaded and authorized in 1Password.
+
+2.  **Ensure Shell is Configured for 1Password Agent:**
+    *   Your `.zshrc` (managed by these dotfiles) now sets the `SSH_AUTH_SOCK` environment variable to point to the 1Password agent. This should happen automatically when you open a new terminal after the dotfiles are set up.
+
+3.  **List Your Available SSH Keys:**
+    *   Open a **new terminal window** (to ensure all shell configurations are loaded).
+    *   Run the command: `ssh-add -L`
+    *   This command will list the public SSH keys that the 1Password agent is currently providing. The output will look something like:
+        ```
+        ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHlourExampleKey... user@example.com
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8LJh... Another Key Title
+        ```
+
+4.  **Identify Your Git Signing Key:**
+    *   From the list provided by `ssh-add -L`, identify the **full public key string** (starting with `ssh-ed25519 AAAA...` or `ssh-rsa AAAA...` and including the comment/title at the end) that you want to use for signing your Git commits.
+    *   **Tip**: Give your Git signing key a clear title in 1Password (e.g., "Git Commit Signing Key") to make it easy to recognize in the `ssh-add -L` output.
+
+5.  **Create/Edit `~/.gitconfig.local`:**
+    *   Create a new file (or edit if it exists for other reasons) at `~/.gitconfig.local` (i.e., in your home directory).
+    *   Add the following content, **replacing the example key with the full public key string you identified in the previous step**:
+        ```ini
+        [user]
+          signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHlourExampleKey... user@example.com
+        ```
+        *Make sure to copy the entire line from `ssh-add -L` for your chosen key as the value for `signingkey`.*
+
+6.  **Verify (Optional but Recommended):**
+    *   Try making a test commit in a local Git repository: `git commit --allow-empty -m "Test commit signing"`
+    *   1Password should prompt you to authorize the signing operation (depending on your 1Password approval settings).
+    *   Check the commit log with `git log --show-signature -1`. You should see information indicating the commit was signed with your key.
+
+**Why this process?**
+
+*   Your main `.gitconfig` enables signing and points to 1Password.
+*   `~/.gitconfig.local` is specific to each machine and tells Git *which specific key* from your 1Password agent to use on *that particular machine*. This file is intentionally **not** part of your public dotfiles repository because the choice of key might differ between machines, or you might not have set it up yet.
+
+By following these steps, your commits will be signed using the SSH key securely managed by 1Password.

@@ -49,3 +49,13 @@ echo "🔄 Reloading Zsh configuration..."
 source ~/.zshrc || echo "⚠️  Could not source ~/.zshrc. Please restart your terminal."
 
 echo "✅ Setup complete! Please restart your terminal for all changes to take effect."
+
+echo -e "\n\n⚠️ IMPORTANT GIT SIGNING SETUP ⚠️"
+echo "---------------------------------------------------------------------"
+echo "Your Git configuration is set up to sign commits using SSH via 1Password."
+echo "To complete this setup, you MUST create or verify the file ~/.gitconfig.local"
+echo "with your specific SSH signing key."
+echo ""
+echo "👉 Please see the 'IMPORTANT: Setting Up Git Commit Signing' section in"
+echo "   dev-setup.md for detailed step-by-step instructions."
+echo "---------------------------------------------------------------------\n"
