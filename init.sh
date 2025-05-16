@@ -12,7 +12,7 @@ else
 fi
 
 echo "🍺 Installing core packages with Homebrew..."
-brew install git gh asdf curl
+brew install git gh asdf curl uv
 
 # Add ASDF to shell if not already there
 # We'll source the final .zshrc later, which should contain this.

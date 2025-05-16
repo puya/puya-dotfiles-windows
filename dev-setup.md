@@ -140,8 +140,115 @@ Global versions are set via the `.tool-versions` file symlinked to `$HOME`.
 
 ---
 
+## ⚡ `uv` (Ultra-Fast Python Tooling)
+
+- **`uv` is an extremely fast Python package installer and virtual environment manager.**
+
+- Think of it as a high-performance replacement for many functionalities of `pip`, `venv`, and even `pipx`.
+
+- It's particularly useful for:
+
+  - Rapidly installing Python CLI tools into isolated environments (e.g., MCP servers, linters).
+
+  - Quickly creating virtual environments.
+
+  - Speeding up `pip install` operations in contexts where Poetry isn't used.
+
+
+### Installed via:
+
+`uv` is installed via Homebrew as part of the `init.sh` script:
+
+```sh
+brew install uv
+```
+
+This makes the `uv` command globally available.
+
+
+### Key Use Cases for `uv`:
+
+1.  **Installing Global Python CLI Tools**:
+
+    - Use `uv tool install <package_name_or_git_url>` (e.g., `uv tool install ruff`, `uv tool install some-mcp-server`).
+
+    - This installs the tool and its dependencies into an isolated environment and makes the executable available on your `PATH`.
+
+    - Ideal for tools you want to use across different projects without them interfering with project-specific dependencies.
+
+
+2.  **Fast Virtual Environment Management (outside Poetry projects)**:
+
+    - Create: `uv venv`
+
+    - Activate: `source .venv/bin/activate` (similar to standard venvs)
+
+
+3.  **Fast Package Installation (outside Poetry projects or for global tools)**:
+
+    - `uv pip install <package_name>`
+
+
+---
+
+
+## 🆚 When to Use `Poetry` vs. `uv`
+
+
+While both tools can manage Python packages, they serve different primary purposes in this setup:
+
+
+*   **Use `Poetry` for:**
+
+    *   **Comprehensive Project Dependency Management**: When working *inside* a Python project (application or library) that has a `pyproject.toml` file.
+
+    *   **Reproducible Environments**: Defining and locking project dependencies (`poetry.lock`) for consistent builds.
+
+    *   **Managing Project-Specific Virtual Environments**: `poetry install` sets up the isolated environment for your project.
+
+    *   **Running Project Tasks**: `poetry run <command>`.
+
+    *   **Building and Publishing Packages**: `poetry build`, `poetry publish`.
+
+    *   **Primary commands**: `poetry add`, `poetry install`, `poetry update`, `poetry run`.
+
+
+
+*   **Use `uv` for:**
+
+    *   **Installing Standalone/Global Python CLI Tools**: For tools you want to use system-wide or across multiple projects *without* adding them to each project's `pyproject.toml`.
+
+        *   **Example**: `uv tool install ruff` (to have Ruff linter globally), `uv tool install an-mcp-server`.
+
+        *   These tools are installed in isolated environments managed by `uv`, separate from your Poetry project environments.
+
+    *   **Ad-hoc/Temporary Virtual Environments**: If you need a quick, temporary Python environment for a script or experiment *not* managed by Poetry.
+
+        *   **Example**: `uv venv` followed by `source .venv/bin/activate` and then `uv pip install some_package`.
+
+    *   **Speeding up one-off `pip install` tasks** where Poetry's full project management isn't needed.
+
+
+
+**Key Distinction:**
+
+-   **Poetry** is your *project-centric* manager. It handles the lifecycle and dependencies of a specific Python package or application you are developing.
+
+-   **`uv`** (in this setup, primarily `uv tool install`) is for installing and managing *external Python tools* that you use *across* projects, or for very fast, lightweight environment/package operations *outside* the context of a Poetry-managed project.
+
+
+
+**Do NOT use `uv pip install` to manage dependencies *inside* a Poetry project's activated environment, as this will bypass Poetry's dependency resolution and `poetry.lock` file, leading to inconsistencies. Always use `poetry add` for that.**
+
+
+---
+
+
+
 ## 📁 `.tool-versions` Example
+
 This file (placed in any project directory) locks tools per project:
+
 ```txt
 python 3.13.3
 nodejs 20.11.1
