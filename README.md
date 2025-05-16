@@ -34,3 +34,5 @@ This will install Homebrew (if missing), asdf, oh-my-zsh, gh, all configured ver
 
 - This repo is a living setup. Expect updates and tweaks as I refine my workflow.
 - Feel free to fork or use as a base for your own dotfiles!
+
+*This setup is actively maintained and updated.*
