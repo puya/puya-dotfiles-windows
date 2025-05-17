@@ -32,7 +32,7 @@ asdf plugin add poetry || echo "✅ Poetry plugin already added"
 echo "📦 Setting up uv with ASDF..."
 asdf plugin add uv || echo "✅ uv plugin already added or failed to add"
 asdf install uv latest || echo "⚠️  Failed to install latest uv. This might require uv to be added to .tool-versions first, or check plugin."
-asdf set -g uv latest || echo "⚠️  Failed to set global uv version with 'asdf set -g'. This would update ~/.tool-versions."
+asdf set uv latest || echo "⚠️  Failed to set uv version with 'asdf set'. This would update ~/.tool-versions."
 
 asdf install || echo "⚠️  ASDF install command finished (check output for errors)."
 
