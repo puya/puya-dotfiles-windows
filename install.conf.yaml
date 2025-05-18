@@ -5,15 +5,6 @@
     ~/.tool-versions: 
       path: .tool-versions
       force: true
-    ~/dev-setup.md: 
-      path: dev-setup.md
-      force: true
     ~/.gitconfig: 
       path: .gitconfig
       force: true
-    ~/Library/Application Support/Code/User/settings.json: 
-      path: vscode/settings.json
-      force: false
-    ~/Library/Application Support/Cursor/User/settings.json: 
-      path: cursor/settings.json
-      force: false
