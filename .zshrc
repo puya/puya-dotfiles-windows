@@ -1,5 +1,5 @@
 # -------------------------------
-# 🔧 ACTIVE CONFIGURATION
+# 🔧 PUYA'S ZSH CONFIGURATION
 # -------------------------------
 
 # Path to your Oh My Zsh installation
@@ -9,13 +9,31 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 
 # Plugins to load
-plugins=(git)
+plugins=(git asdf)
 
 # Load Oh My Zsh
 source $ZSH/oh-my-zsh.sh
 
-# Initialize asdf (for managing Node, Python, etc.)
-. "$(brew --prefix asdf)/libexec/asdf.sh"
+# -------------------------------
+# 📦 MODULAR CONFIGURATION
+# -------------------------------
+
+# Get the directory where this .zshrc file is located
+DOTFILES_DIR="$(dirname "$(readlink ~/.zshrc 2>/dev/null || echo ~/.zshrc)")"
+
+# Source modular configuration files
+for config_file in "$DOTFILES_DIR/zsh"/*.zsh; do
+  if [[ -r "$config_file" ]]; then
+    source "$config_file"
+  fi
+done
+
+# -------------------------------
+# 🎯 LOCAL OVERRIDES
+# -------------------------------
+
+# Source local configuration if it exists (machine-specific settings)
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # -------------------------------
 # 📎 OPTIONAL SETTINGS & NOTES

@@ -8,3 +8,9 @@
     ~/.gitconfig: 
       path: .gitconfig
       force: true
+    ~/Brewfile:
+      path: Brewfile
+      force: true
+    ~/zsh:
+      path: zsh
+      force: true

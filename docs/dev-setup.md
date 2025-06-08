@@ -22,7 +22,7 @@ brew install poetry
 
 ---
 
-## 🌀 Shell: `zsh` + Oh My Zsh
+## 🌀 Shell: `zsh` + Oh My Zsh (Modular Configuration)
 - **Zsh** is your terminal shell (replaces Bash on modern macOS).
 - **Oh My Zsh** is a community-driven framework for managing your Zsh config:
   - Adds themes
@@ -34,13 +34,29 @@ brew install poetry
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
-### `.zshrc` Active Setup:
+### Modular Configuration Structure:
+The shell configuration is now split into focused modules for better organization:
+
+- **`zsh/exports.zsh`** - Environment variables, PATH modifications, and editor config
+- **`zsh/aliases.zsh`** - Command shortcuts, Git aliases, and modern tool replacements
+- **`zsh/functions.zsh`** - Useful shell functions (mkcd, extract, killport, etc.)
+- **`zsh/asdf.zsh`** - ASDF version manager configuration and completions
+
+### Main `.zshrc` Setup:
 ```sh
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
-plugins=(git)
+plugins=(git asdf)
 source $ZSH/oh-my-zsh.sh
-. $(brew --prefix asdf)/libexec/asdf.sh
+
+# Automatically source all modular configuration files
+DOTFILES_DIR="$(dirname "$(readlink ~/.zshrc 2>/dev/null || echo ~/.zshrc)")"
+for config_file in "$DOTFILES_DIR/zsh"/*.zsh; do
+  [[ -r "$config_file" ]] && source "$config_file"
+done
+
+# Source local overrides if they exist
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 ```
 
 ### Poetry with ASDF:
@@ -297,11 +313,36 @@ Then run:
 
 ---
 
+## 🩺 Health Check System
+
+The `doctor.sh` script provides comprehensive health checks for your development environment:
+
+```sh
+./doctor.sh
+```
+
+**What it checks:**
+- ✅ **System Information** - Platform, shell, user details
+- ✅ **Homebrew** - Installation, health, and Brewfile packages
+- ✅ **Core Tools** - Git, GitHub CLI, ASDF, and essential utilities
+- ✅ **Language Environments** - Python, Node.js, and version matching
+- ✅ **Dotfiles** - Proper symlinking and modular configuration
+- ✅ **Git & SSH** - Authentication, signing, and 1Password integration
+- ✅ **Shell Configuration** - ZSH, Oh My Zsh, and ASDF loading
+
+**Color-coded output:**
+- 🟢 **Green**: Everything working correctly
+- 🟡 **Yellow**: Warnings (optional features or minor issues)
+- 🔴 **Red**: Critical issues that need attention
+
+Run this regularly to ensure your environment stays healthy!
+
 ## 🧠 Tips
 - Keep this file (`dev-setup.md`) in your `dotfiles` repo
 - Use it to track versions, config, and setup decisions
 - Expand your `dotfiles` repo with aliases, functions, and other config over time
 - Document changes as you go to keep your setup reproducible and transparent
+- Run `./doctor.sh` after making changes to validate your setup
 
 ---
 
