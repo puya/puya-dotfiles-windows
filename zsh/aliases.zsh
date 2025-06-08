@@ -18,9 +18,10 @@ alias la="ls -A"
 alias l="ls -CF"
 
 # Modern replacements (if installed via Brewfile)
-if command -v exa &> /dev/null; then
-  alias ls="exa"
-  alias ll="exa -la"
+if command -v eza &> /dev/null; then
+  alias ls="eza"
+  alias ll="eza -la"
+  alias tree="eza --tree"
 fi
 
 if command -v bat &> /dev/null; then

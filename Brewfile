@@ -1,8 +1,7 @@
 # Homebrew Bundle file for managing packages
 # Install with: brew bundle
 
-# Taps
-tap "homebrew/bundle"
+# Note: homebrew/bundle tap is no longer needed (merged into core)
 
 # Core development tools
 brew "git"
@@ -20,7 +19,7 @@ brew "diff-so-fancy"
 brew "ripgrep"
 brew "fd"
 brew "bat"
-brew "exa"
+brew "eza"  # Modern replacement for ls (successor to exa)
 
 # Optional: Uncomment based on your needs
 brew "docker"
