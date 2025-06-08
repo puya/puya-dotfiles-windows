@@ -9,6 +9,7 @@ brew "gh"
 brew "asdf"
 brew "curl"
 brew "git-lfs"
+brew "gnupg"
 
 # Additional useful development tools
 brew "wget"

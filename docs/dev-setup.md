@@ -35,21 +35,25 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 ```
 
 ### Modular Configuration Structure:
-The shell configuration is now split into focused modules for better organization:
+The shell configuration is now split into focused, numbered modules to enforce a specific loading order. This ensures that dependencies like environment variables are available before scripts that need them are executed.
 
-- **`zsh/exports.zsh`** - Environment variables, PATH modifications, and editor config
-- **`zsh/aliases.zsh`** - Command shortcuts, Git aliases, and modern tool replacements
-- **`zsh/functions.zsh`** - Useful shell functions (mkcd, extract, killport, etc.)
-- **`zsh/asdf.zsh`** - ASDF version manager configuration and completions
+- **`zsh/01-exports.zsh`** - Environment variables, `PATH` modifications, and 1Password agent.
+- **`zsh/02-asdf.zsh`** - ASDF version manager initialization.
+- **`zsh/10-aliases.zsh`** - Command shortcuts, Git aliases, and modern tool replacements.
+- **`zsh/11-functions.zsh`** - Useful shell functions (mkcd, extract, killport, etc.)
+
+The numbering scheme leaves room for future expansion (e.g., adding `03-custom.zsh` for new low-level setup).
 
 ### Main `.zshrc` Setup:
+The main `.zshrc` file is now much simpler. It initializes Oh My Zsh and then automatically sources all the modules from the `zsh/` directory in their numbered order.
+
 ```sh
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 plugins=(git asdf)
 source $ZSH/oh-my-zsh.sh
 
-# Automatically source all modular configuration files
+# Automatically source all modular configuration files in order
 DOTFILES_DIR="$(dirname "$(readlink ~/.zshrc 2>/dev/null || echo ~/.zshrc)")"
 for config_file in "$DOTFILES_DIR/zsh"/*.zsh; do
   [[ -r "$config_file" ]] && source "$config_file"
@@ -99,54 +103,32 @@ Use `asdf list all <tool>` to see all available versions.
 ✅ Works seamlessly with tools like Poetry, nvm, pyenv, etc.
 
 ### Installed via:
-```sh
-brew install asdf
-```
+The entire setup process, including installing Homebrew and all packages from the `Brewfile`, is handled by the main `./init.sh` script.
 
 ### Required shell init:
-Add this to your `~/.zshrc`:
-```sh
-. $(brew --prefix asdf)/libexec/asdf.sh
-```
+This is now handled automatically by the `zsh/01-exports.zsh` and `zsh/02-asdf.zsh` module files. You no longer need to add this to your `.zshrc` manually.
 
 ### Node.js with ASDF:
-```sh
-asdf plugin add nodejs
-asdf install nodejs latest
-asdf set -g nodejs 20.11.1
-```
+The version of Node.js is defined in the `.tool-versions` file. The `./init.sh` script installs the correct version automatically. To update it, run `./update-versions.sh`.
 
 ### Python with ASDF:
-```sh
-asdf plugin add python
-asdf install python 3.13.3
-asdf set -g python 3.13.3
-```
+The version of Python is defined in the `.tool-versions` file. The `./init.sh` script installs the correct version automatically. To update it, run `./update-versions.sh`. The update script is smart enough to select the latest stable, non-experimental build.
 
 ### Examples of other tools to install with ASDF:
-```sh
-asdf plugin add deno
-asdf install deno latest
-asdf set -g deno latest
-
-asdf plugin add java
-asdf install java openjdk-17
-asdf set -g java openjdk-17
-```
-
-Use `asdf list all <tool>` to see all available versions.
+To add a new tool:
+1.  Add the plugin: `asdf plugin add <toolname>`
+2.  Add the tool and desired version to your `.tool-versions` file (e.g., `golang 1.22.5`).
+3.  Run `asdf install`.
 
 ---
 
 ## 🐍 Python + Poetry
-- Python and Poetry are now managed by `asdf` (not Homebrew)
-- Poetry uses the active Python version from `asdf`:
-
-```sh
-poetry env use $(asdf which python)
-```
-
-This ensures Poetry uses the ASDF-managed Python version.
+- Python and Poetry are managed via `asdf` and defined in `.tool-versions`.
+- The `init.sh` script handles the complex installation order automatically:
+  1. Installs Python.
+  2. Runs `asdf reshim` to make `python` available.
+  3. Installs Poetry, which depends on the newly available Python.
+- This ensures Poetry uses the correct ASDF-managed Python version without manual intervention.
 
 Each project has its own isolated environment.
 
@@ -175,27 +157,7 @@ Global versions are set via the `.tool-versions` file symlinked to `$HOME`.
 
 ### Installed via ASDF (Recommended):
 
-The `init.sh` script handles the installation and configuration of `uv` using `asdf`. Here's how it works:
-
-1.  **Plugin Addition**:
-    ```sh
-    asdf plugin add uv
-    ```
-    This ensures the `uv` plugin is available to `asdf`.
-
-2.  **Installation of Latest Version**:
-    ```sh
-    asdf install uv latest
-    ```
-    This command installs the most recent version of `uv` available through the `asdf` plugin.
-
-3.  **Setting Global Version and Updating `.tool-versions`**:
-    ```sh
-    asdf set -g uv latest
-    ```
-    This command sets the just-installed latest version of `uv` as the global default. Crucially, it also **updates your global `~/.tool-versions` file** (which is symlinked from `~/dotfiles/.tool-versions`) to pin this specific latest version (e.g., `uv 0.7.5` or whatever version was fetched).
-
-This approach ensures that your development environment is always set up with the newest stable release of `uv` during the initial setup, and that version is then recorded in `.tool-versions` for consistency. If you wish to use a different specific version of `uv` later, you can manually change it in `.tool-versions` and run `asdf install`.
+The `./init.sh` script handles the installation and configuration of `uv` using `asdf`. Your `.tool-versions` file determines which version is installed and used. You can update it by running `./update-versions.sh`.
 
 # Alternative: Direct installation script (if not using ASDF for uv)
 # curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -272,8 +234,11 @@ ASDF will auto-switch to these versions when you `cd` into the folder.
 
 ## 📂 Dotfiles Repo + Dotbot Setup (Optional)
 
-**Dotbot** is a tool to automate symlinking your dotfiles into place.
-Great for setting up a new machine in one step.
+**Dotbot** is a tool to automate symlinking your dotfiles. The entire Dotbot process is orchestrated by the main `./init.sh` script.
+
+The `link-dotfiles.sh` script handles pre-run checks and ensures a clean link process.
+
+The configuration for which files to link is managed in `install.conf.yaml`.
 
 ### Basic Folder Structure:
 ```

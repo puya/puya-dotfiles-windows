@@ -62,30 +62,34 @@ log "🛠️  Starting system setup..."
 save_step "init"
 
 # Install Homebrew if not already installed
-if ! command -v brew &>/dev/null; then
-  log "🍺 Installing Homebrew..."
-  save_step "homebrew_install"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # Add Homebrew to PATH for the current script session
-  if [ -x "$HOMEBREW_PREFIX/bin/brew" ]; then
-    eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
-  fi
+# Check for the executable directly to be robust
+if [ -x "$HOMEBREW_PREFIX/bin/brew" ]; then
+    log "🍺 Homebrew already installed."
 else
-  log "🍺 Homebrew already installed."
-  read -r -p "🤔 Do you want to update Homebrew? (yes/no): " update_brew_confirmation
-  if [[ "$update_brew_confirmation" == "yes" ]]; then
+    log "🍺 Homebrew not found. Installing..."
+    save_step "homebrew_install"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Add Homebrew to this script's PATH
+eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
+log "✅ Homebrew is on the PATH for this script."
+
+# Ask about updating Homebrew.
+read -r -p "🤔 Do you want to update Homebrew and its packages (takes a few minutes)? (y/N): " update_brew_confirmation
+
+# Always run brew bundle, but add `brew update` if confirmed.
+if [[ "${update_brew_confirmation}" =~ ^[Yy]$ ]]; then
     log "🍺 Updating Homebrew..."
     save_step "homebrew_update"
     brew update
-  else
-    log "🍺 Skipping Homebrew update."
-  fi
 fi
 
-log "🍺 Installing packages with Homebrew Bundle..."
+log "🍺 Installing/upgrading packages with Homebrew Bundle..."
 save_step "homebrew_packages"
 if [[ -f "Brewfile" ]]; then
-  # Install missing packages and upgrade existing ones
+  # Using --no-lock prevents issues if a Brewfile.lock exists and is out of date.
+  # We want to install based on the Brewfile definitions.
   brew bundle --file=Brewfile
   log "✅ Homebrew packages installed/updated via Brewfile"
 else
@@ -120,53 +124,116 @@ else
   fi
   ln -s "$GITCONFIG_SYMLINK_TARGET" ~/.gitconfig
   log "   ✅ Your .gitconfig has been temporarily linked."
-  log ""
-  log "⚠️  ACTION REQUIRED: Configure SSH Key for Git & 1Password ⚠️"
-  log "---------------------------------------------------------------------"
-  log "Your dotfiles repository or its submodules (like dotbot) may be private."
-  log "To allow this script to securely access them using your SSH key via 1Password,"
-  log "please follow these steps CAREFULLY in a NEW terminal window:"
-  log ""
-  log "1. Ensure the 1Password desktop application is running and unlocked."
-  log "2. In 1Password App: Go to Settings > Developer, and ensure 'Use the SSH Agent' is ENABLED."
-  log "3. In a NEW terminal, run: ssh-add -L"
-  log "   This lists SSH keys 1Password agent provides. Identify your desired Git signing/authentication key."
-  log "   It will look like: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-comment"
-  log ""
-  log "4. Create or edit the file ~/.gitconfig.local (in your home directory)."
-  log "   Add the following line, replacing the example with YOUR FULL public key string from step 3:"
-  log "   [user]"
-  log "     signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-comment"
-  log ""
-  log "5. Save ~/.gitconfig.local."
-  log "---------------------------------------------------------------------"
-  read -r -p "✅ Have you completed these steps and saved ~/.gitconfig.local? (yes/no): " confirmation
-  if [[ "$confirmation" != "yes" ]]; then
-    log "🛑 Setup paused. Please complete the steps above to continue."
-    log "   Re-run this script once ~/.gitconfig.local is correctly set up."
-    exit 1
-  fi
-  log "👍 Great! Proceeding with the rest of the setup..."
+  log "⏭️  SSH signing setup will be done after dotfiles are linked..."
 fi
 # --- Git Authentication Setup Done ---
 
 log "📦 Setting up ASDF..."
 save_step "asdf_setup"
-# Temporarily source asdf for this script session
+
+# Temporarily source asdf for this script session FIRST
 . "$(brew --prefix asdf)/libexec/asdf.sh" || log "Failed to source ASDF for init script, continuing..."
+log "✅ ASDF environment sourced for this script."
 
-asdf plugin add python || log "✅ Python plugin already added"
-asdf plugin add nodejs || log "✅ NodeJS plugin already added"
-asdf plugin add poetry || log "✅ Poetry plugin already added"
+log "🔌 Installing ASDF plugins from .tool-versions..."
+save_step "asdf_plugins"
+if [[ -f ".tool-versions" ]]; then
+  # Use cut to get the first column (tool name) and iterate
+  # This is more robust against lines with comments or different version formats
+  cut -d' ' -f1 < .tool-versions | while read -r tool; do
+    # Skip comments and empty lines
+    [[ "$tool" == "#"* ]] || [[ -z "$tool" ]] && continue
+    if ! asdf plugin list | grep -q "^${tool}$"; then
+      log "   -> Adding plugin for $tool..."
+      asdf plugin add "$tool"
+    else
+      log "   -> Plugin for $tool already exists."
+    fi
+  done
+  log "✅ ASDF plugins are up to date."
+else
+    log "⚠️  .tool-versions not found, cannot install plugins."
+fi
 
-log "📦 Setting up uv with ASDF..."
-save_step "uv_setup"
-asdf plugin add uv || log "✅ uv plugin already added or failed to add"
-asdf install uv latest || log "⚠️  Failed to install latest uv. This might require uv to be added to .tool-versions first, or check plugin."
-asdf global uv latest || log "⚠️  Failed to set uv version with 'asdf global'. This would update ~/.tool-versions."
+log "⬆️  Updating ASDF plugins to latest versions..."
+save_step "asdf_plugin_update"
+asdf plugin update --all || log "⚠️  ASDF plugin update finished (check output for errors)."
 
-save_step "asdf_install"
+log "🔄 Updating tool versions to latest..."
+save_step "asdf_version_update"
+./update-versions.sh
+
+log "📦 Installing Python first for dependencies..."
+save_step "asdf_install_python"
+asdf install python || log "⚠️  ASDF could not install python (check output for errors)."
+
+log "🔄 Reshimming to make python available to other tools..."
+asdf reshim python
+
+log "📦 Installing other tools with ASDF..."
+save_step "asdf_install_others"
+# Install other tools; they can run in parallel now
 asdf install || log "⚠️  ASDF install command finished (check output for errors)."
+
+# Run dotfiles linking script FIRST (before SSH setup)
+log "🔗 Linking dotfiles with Dotbot..."
+save_step "dotbot_linking"
+./link-dotfiles.sh # Use the renamed script
+
+# Source the new shell configuration to get 1Password SSH agent
+log "🔄 Loading new shell configuration for SSH setup..."
+if [[ -f ~/.zshrc ]]; then
+  # Source the modular configs directly since we can't reload the full zshrc in bash
+  if [[ -f ~/zsh/exports.zsh ]]; then
+    source ~/zsh/exports.zsh
+    log "✅ 1Password SSH agent configuration loaded"
+  fi
+fi
+
+# Set up .gitconfig.local with good defaults
+if [[ -f "$HOME/.gitconfig.local" ]]; then
+  log "✅ ~/.gitconfig.local already exists - skipping creation"
+else
+  if [[ -f "templates/gitconfig.local.example" ]]; then
+    cp "templates/gitconfig.local.example" "$HOME/.gitconfig.local"
+    log "📋 Created ~/.gitconfig.local with good defaults"
+    log "🔑 You'll need to add your SSH signing key to this file"
+  else
+    log "⚠️  Template file not found - skipping .gitconfig.local creation"
+  fi
+fi
+
+# Always copy the example file for reference
+if [[ -f "templates/gitconfig.local.example" ]] && [[ ! -f "$HOME/.gitconfig.local.example" ]]; then
+  cp "templates/gitconfig.local.example" "$HOME/.gitconfig.local.example"
+  log "📋 Reference template copied to ~/.gitconfig.local.example"
+fi
+
+# Now set up SSH signing with proper environment
+log "🔐 Setting up SSH signing with 1Password..."
+save_step "ssh_signing_setup"
+# Check if a non-commented 'signingkey' line contains the placeholder
+if grep -q -E "^\s*signingkey\s*=\s*YOUR_SSH_PUBLIC_KEY_HERE" "$HOME/.gitconfig.local"; then
+  log "Your Git configuration is ready, but you need to add your SSH signing key."
+  log ""
+  log "1. In another terminal, run: ssh-add -L"
+  log "2. Copy one of your SSH public key strings (the full line)."
+  log "3. You will be prompted to paste it in the editor that opens next."
+  log ""
+  read -r -p "✅ Press [Enter] when you are ready to edit ~/.gitconfig.local..."
+  
+  # Open the file in the user's editor
+  ${EDITOR:-vim} "$HOME/.gitconfig.local"
+
+  # Verify the key has been replaced
+  if grep -q -E "^\s*signingkey\s*=\s*YOUR_SSH_PUBLIC_KEY_HERE" "$HOME/.gitconfig.local"; then
+    log "⚠️  Placeholder key still found. Please complete the setup manually."
+  else
+    log "✅ SSH signing key has been updated!"
+  fi
+else
+    log "✅ SSH signing key already configured in ~/.gitconfig.local. Skipping."
+fi
 
 # Install Oh My Zsh (if not present)
 # It creates a default ~/.zshrc which we'll overwrite next.
@@ -179,11 +246,6 @@ else
   log "🎩 Oh My Zsh already installed."
 fi
 
-# Run dotfiles linking script (which now forces overwrite)
-log "🔗 Linking dotfiles with Dotbot..."
-save_step "dotbot_linking"
-./link-dotfiles.sh # Use the renamed script
-
 # Reload zsh config to apply changes including ASDF path
 log "🔄 Reloading Zsh configuration... is not possible from a bash script. Please restart your terminal or open a new zsh session."
 
@@ -194,14 +256,22 @@ brew cleanup
 save_step "complete"
 log "✅ Setup complete! Please restart your terminal for all changes to take effect."
 
-log -e "\n\n⚠️ IMPORTANT GIT SIGNING SETUP ⚠️"
+log -e "\n\n🔑 FINAL STEP: SSH SIGNING KEY SETUP"
 log "---------------------------------------------------------------------"
-log "Your Git configuration is set up to sign commits using SSH via 1Password."
-log "To complete this setup, you MUST create or verify the file ~/.gitconfig.local"
-log "with your specific SSH signing key."
+log "Your Git configuration is ready, but you need to add your SSH signing key."
 log ""
-log "👉 Please see the 'IMPORTANT: Setting Up Git Commit Signing' section in"
-log "   dev-setup.md for detailed step-by-step instructions."
+log "📝 QUICK SETUP:"
+log "1. Run: ssh-add -L"
+log "2. Copy one of the SSH keys (the full line)"
+log "3. Edit ~/.gitconfig.local and replace 'YOUR_SSH_PUBLIC_KEY_HERE' with your key"
+log ""
+log "🛠️  ALTERNATIVE: Run './setup-ssh-signing.sh' for interactive setup"
+log ""
+log "✅ Your ~/.gitconfig.local file has been created with good defaults including:"
+log "   • Useful Git aliases (co, br, ci, st, lg, etc.)"
+log "   • Smart push/pull behavior"
+log "   • VS Code/Cursor integration for diffs and merges"
+log "   • macOS keychain integration"
 log "---------------------------------------------------------------------\n"
 
 # Run health check
