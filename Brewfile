@@ -23,9 +23,9 @@ brew "bat"
 brew "exa"
 
 # Optional: Uncomment based on your needs
-# brew "docker"
+brew "docker"
 # brew "postgresql"
-# brew "redis"
+brew "redis"
 # brew "nginx"
 
 # Casks (GUI applications)
