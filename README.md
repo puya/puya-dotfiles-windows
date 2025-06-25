@@ -51,6 +51,14 @@ The Zsh configuration is split into modules loaded in a specific order to ensure
 
 The numbering scheme leaves room for future expansion. Critical setup files are numbered `01-09`, while user-facing configs are `10-19`.
 
+### 🚧 Future Enhancements Under Consideration
+
+**Modern ZSH Framework Alternatives:**
+- **[ZAP](https://github.com/zap-zsh/zap)**: Minimal, fast ZSH plugin manager as alternative to Oh My Zsh
+- **[ZAP Supercharge](https://github.com/zap-zsh/supercharge)**: Enhanced ZSH experience with auto-CD, interactive completions, and quality-of-life improvements
+- **[Powerlevel10k](https://github.com/romkatv/powerlevel10k)**: Ultra-fast, feature-rich ZSH theme (framework-agnostic, works with current setup)
+- **Performance**: ZAP offers 3-5x faster startup times compared to Oh My Zsh while maintaining compatibility with OMZ plugins
+
 ## 📦 Package Management
 
 Your system packages are managed declaratively via the `Brewfile`. Here are some useful commands:
