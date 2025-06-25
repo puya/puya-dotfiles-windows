@@ -27,15 +27,16 @@ The script is idempotent, meaning you can safely run `./init.sh` again at any ti
 This is what the `init.sh` script automates for you:
 
 1.  **🚀 Run Setup**: The script installs Homebrew, all packages from the `Brewfile`, and all `asdf` tool plugins.
-2.  **⏸️ Pause & Edit**: The script pauses and opens `~/.gitconfig.local` in your editor.
-3.  **🔑 Get SSH Key**: During the pause, you can run `ssh-add -L` in another terminal to get your SSH public key.
-4.  **✅ You're Done**: Paste your key into the editor, save the file, and close it. The script finishes the setup. Restart your terminal to enjoy the new environment!
+2.  **🔐 GitHub CLI Setup**: The script offers to configure GitHub CLI with 1Password for biometric authentication.
+3.  **⏸️ SSH Key Setup**: If needed, the script helps you configure SSH signing keys from 1Password.
+4.  **✅ You're Done**: Restart your terminal to enjoy the new environment with secure, biometric authentication!
 
 ## 🛠️ Core Scripts
 
-Your environment is managed by three key scripts:
+Your environment is managed by four key scripts:
 
 -   `./init.sh`: **Installs and configures everything.** This is the main script to run on a new machine or to repair your existing setup.
+-   `./setup-github-cli.sh`: **Configure GitHub CLI authentication.** Choose between 1Password shell plugin or SSH authentication.
 -   `./doctor.sh`: **Checks environment health.** Run this anytime to validate that all tools, paths, and symlinks are correctly configured.
 -   `./update-versions.sh`: **Updates tool versions.** This script checks for the latest stable releases of the tools in `.tool-versions` and updates the file for you. Run `asdf install` afterwards to apply the changes.
 
@@ -64,6 +65,41 @@ The `init.sh` script handles the interactive setup of your SSH signing key. Howe
 
 Your main `.gitconfig` is set up to include a machine-specific `~/.gitconfig.local` file. This is where your signing key and other local settings are stored, keeping them separate from your public dotfiles.
 
+## 🐙 GitHub CLI Authentication
+
+The GitHub CLI (`gh`) can be authenticated in two ways with your existing 1Password setup:
+
+### Option 1: 1Password Shell Plugin (Recommended)
+- Uses a Personal Access Token stored securely in 1Password
+- Biometric authentication for each GitHub operation
+- Seamless integration with your existing 1Password workflow
+
+### Option 2: SSH Authentication  
+- Leverages your existing SSH keys from 1Password SSH agent
+- No separate token needed
+- Uses the same SSH setup as Git operations
+
+**Automatic Setup:**
+The `./init.sh` script now includes GitHub CLI setup and will offer to configure it for you during the main setup process.
+
+**Manual Setup:**
+```bash
+# Interactive setup script
+./setup-github-cli.sh
+
+# Or configure manually:
+# Option 1: 1Password Shell Plugin (Recommended)
+op plugin init gh
+
+# Option 2: SSH Authentication
+gh auth login -p ssh
+```
+
+**How it Works:**
+- **1Password Shell Plugin**: Uses biometric authentication (Touch ID/Face ID) for each GitHub operation
+- **Personal Access Token**: Stored securely in 1Password, never touches your filesystem
+- **Seamless Integration**: Works with your existing 1Password workflow
+
 ## 🩺 Health Check
 
 After setup or anytime you suspect an issue, run the health check script:
@@ -77,6 +113,7 @@ This will validate your entire environment, including:
 -   Dotfiles are properly symlinked.
 -   Version managers are configured correctly.
 -   Git and SSH authentication is set up.
+-   GitHub CLI authentication status.
 
 ## 🛠️ Error Recovery
 

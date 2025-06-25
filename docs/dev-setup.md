@@ -289,10 +289,11 @@ The `doctor.sh` script provides comprehensive health checks for your development
 **What it checks:**
 - ✅ **System Information** - Platform, shell, user details
 - ✅ **Homebrew** - Installation, health, and Brewfile packages
-- ✅ **Core Tools** - Git, GitHub CLI, ASDF, and essential utilities
+- ✅ **Core Tools** - Git, GitHub CLI, ASDF, 1Password CLI, and essential utilities
 - ✅ **Language Environments** - Python, Node.js, and version matching
 - ✅ **Dotfiles** - Proper symlinking and modular configuration
 - ✅ **Git & SSH** - Authentication, signing, and 1Password integration
+- ✅ **GitHub CLI** - 1Password plugin configuration and shell integration
 - ✅ **Shell Configuration** - ZSH, Oh My Zsh, and ASDF loading
 
 **Color-coded output:**
@@ -389,3 +390,110 @@ Your main `.gitconfig` (managed by these dotfiles) is set up to sign Git commits
 *   `~/.gitconfig.local` is specific to each machine and tells Git *which specific key* from your 1Password agent to use on *that particular machine*. This file is intentionally **not** part of your public dotfiles repository because the choice of key might differ between machines, or you might not have set it up yet.
 
 By following these steps, your commits will be signed using the SSH key securely managed by 1Password.
+
+---
+
+## 🐙 GitHub CLI Authentication with 1Password
+
+The GitHub CLI (`gh`) is configured to use 1Password for secure, biometric authentication. This setup provides several advantages over traditional authentication methods.
+
+### 🔐 1Password Shell Plugin Setup
+
+The recommended approach uses 1Password's shell plugin system, which provides:
+
+- **Biometric Authentication**: Touch ID/Face ID for each GitHub operation
+- **Secure Token Storage**: Personal Access Token stored encrypted in 1Password
+- **No Plaintext Secrets**: Token never touches your filesystem
+- **Seamless Integration**: Works with your existing 1Password workflow
+
+### 🚀 Automatic Setup
+
+The `./init.sh` script includes GitHub CLI setup and will:
+
+1. **Detect 1Password CLI**: Verify that 1Password CLI is installed and signed in
+2. **Offer Configuration**: Prompt you to set up GitHub CLI with 1Password
+3. **Initialize Plugin**: Run `op plugin init gh` to configure the shell plugin
+4. **Configure Shell**: Add the necessary sourcing to your `.zshrc`
+
+### 🔧 Manual Setup
+
+If you need to configure GitHub CLI authentication manually:
+
+```bash
+# Interactive setup script (recommended)
+./setup-github-cli.sh
+
+# Or configure manually:
+op plugin init gh
+```
+
+The setup process will:
+1. Prompt you to select or create a GitHub Personal Access Token in 1Password
+2. Ask about credential scope (global, directory, or session)
+3. Configure the shell plugin for biometric authentication
+
+### 📋 Required Token Permissions
+
+Your GitHub Personal Access Token should have these scopes:
+- `repo` - Full control of private repositories
+- `workflow` - Update GitHub Action workflows
+- `read:org` - Read org and team membership
+- `gist` - Create gists
+
+### 🎯 How It Works
+
+1. **Command Execution**: When you run a `gh` command, the shell plugin intercepts it
+2. **Biometric Prompt**: 1Password prompts for Touch ID/Face ID authentication
+3. **Token Injection**: The Personal Access Token is securely injected as an environment variable
+4. **Command Execution**: GitHub CLI runs with the authenticated token
+5. **Clean Up**: Token is removed from memory after the command completes
+
+### 🧪 Testing Your Setup
+
+After configuration, test your setup:
+
+```bash
+# Check authentication status
+gh auth status
+
+# List your repositories
+gh repo list
+
+# Test API access
+gh api user
+```
+
+You should see biometric prompts from 1Password when running these commands.
+
+### 🔍 Troubleshooting
+
+**Plugin not working?**
+- Ensure 1Password desktop app is running and unlocked
+- Verify the plugin is configured: `op plugin list`
+- Check that plugins are sourced in your shell: `grep plugins ~/.zshrc`
+
+**No biometric prompts?**
+- Restart your terminal to reload shell configuration
+- Verify 1Password CLI integration is enabled in 1Password settings
+- Test with: `op account list`
+
+**Authentication failing?**
+- Check token permissions in GitHub settings
+- Verify the token is stored correctly in 1Password
+- Reconfigure with: `op plugin clear gh --all && op plugin init gh`
+
+### 🆚 Alternative: SSH Authentication
+
+If you prefer to use SSH authentication instead of the 1Password plugin:
+
+```bash
+gh auth login -p ssh
+gh auth setup-git  # Configure Git to use GitHub CLI
+```
+
+This approach:
+- Uses your existing SSH keys from 1Password SSH agent
+- Leverages the same SSH setup as Git operations
+- No separate token needed
+
+However, the 1Password shell plugin approach is recommended for better security separation and granular token permissions.

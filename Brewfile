@@ -11,6 +11,9 @@ brew "curl"
 brew "git-lfs"
 brew "gnupg"
 
+# 1Password CLI for shell plugins and secure authentication
+cask "1password-cli"
+
 # Additional useful development tools
 brew "wget"
 brew "jq"
