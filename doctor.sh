@@ -121,12 +121,12 @@ if check_command "brew" "Homebrew"; then
     check_warn "Homebrew doctor found some issues (run 'brew doctor' for details)"
   fi
   
-  # Check if Brewfile exists and is valid
-  if check_file "$HOME/Brewfile" "Brewfile"; then
-    if brew bundle check --file="$HOME/Brewfile" &> /dev/null; then
-      check_pass "All Brewfile packages are installed"
-    else
-      check_warn "Some Brewfile packages are missing (run 'brew bundle install' to fix)"
+      # Check if Brewfile exists and is valid
+    if check_file "$HOME/.Brewfile" "Brewfile"; then
+        if brew bundle check --file="$HOME/.Brewfile" &> /dev/null; then
+            check_pass "All Brewfile packages are installed"
+        else
+            check_warn "Some Brewfile packages are missing (run 'brew bundle install' to fix)"
     fi
   fi
 fi
@@ -140,6 +140,7 @@ check_command "git" "Git"
 check_command "gh" "GitHub CLI"
 check_command "curl" "cURL"
 check_command "asdf" "ASDF"
+check_command "op" "1Password CLI"
 
 # -------------------------------
 # 🐍 PYTHON & UV CHECKS
@@ -201,13 +202,13 @@ print_header "Dotfiles Configuration"
 check_symlink "$HOME/.zshrc" "ZSH configuration"
 check_symlink "$HOME/.gitconfig" "Git configuration"
 check_symlink "$HOME/.tool-versions" "ASDF tool versions"
-check_symlink "$HOME/Brewfile" "Homebrew bundle file"
+    check_symlink "$HOME/.Brewfile" "Homebrew bundle file"
 
 # Check if zsh modules are properly linked
-if [[ -L "$HOME/zsh" ]]; then
+if [[ -L "$HOME/.zsh" ]]; then
   check_pass "ZSH modules directory is symlinked"
   for module in 01-exports 02-asdf 10-aliases 11-functions; do
-    if [[ -f "$HOME/zsh/$module.zsh" ]]; then
+    if [[ -f "$HOME/.zsh/$module.zsh" ]]; then
       check_pass "ZSH module exists: $module.zsh"
     else
       check_fail "ZSH module missing: $module.zsh"
@@ -272,6 +273,33 @@ if [[ -n "$SSH_AUTH_SOCK" ]]; then
   fi
 else
   check_warn "SSH_AUTH_SOCK is not configured"
+fi
+
+# Check GitHub CLI authentication
+if command -v gh &> /dev/null; then
+  # Check if 1Password plugin is configured first
+  if command -v op &> /dev/null && op plugin list 2>/dev/null | grep -q "^gh.*GitHub"; then
+    check_pass "GitHub CLI is configured with 1Password plugin"
+    
+    # Test if plugins are sourced in current shell
+    if [[ -f "$HOME/.config/op/plugins.sh" ]]; then
+      if grep -q "source.*plugins.sh" "$HOME/.zshrc" 2>/dev/null; then
+        check_pass "1Password plugins are configured in shell"
+        check_pass "GitHub CLI ready (uses biometric authentication via 1Password)"
+      else
+        check_warn "1Password plugins not sourced in shell"
+        echo "  💡 Add 'source ~/.config/op/plugins.sh' to your ~/.zshrc"
+      fi
+    else
+      check_warn "1Password plugins file not found"
+      echo "  💡 Run 'op plugin init gh' to set up GitHub CLI authentication"
+    fi
+  elif gh auth status &> /dev/null; then
+    check_pass "GitHub CLI is authenticated (traditional method)"
+  else
+    check_warn "GitHub CLI is not authenticated"
+    echo "  💡 Run './setup-github-cli.sh' to set up authentication"
+  fi
 fi
 
 # -------------------------------

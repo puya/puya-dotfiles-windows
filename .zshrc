@@ -22,7 +22,7 @@ source $ZSH/oh-my-zsh.sh
 DOTFILES_DIR="$(dirname "$(readlink ~/.zshrc 2>/dev/null || echo ~/.zshrc)")"
 
 # Source modular configuration files
-for config_file in "$DOTFILES_DIR/zsh"/*.zsh; do
+for config_file in "$HOME/.zsh"/*.zsh; do
   if [[ -r "$config_file" ]]; then
     source "$config_file"
   fi
@@ -100,3 +100,9 @@ export PATH="/Users/puya/.codeium/windsurf/bin:$PATH"
 
 # 1Password SSH Agent Sock (ensure this is the LAST definition of this var)
 export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+source /Users/puya/.config/op/plugins.sh
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/puya/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions

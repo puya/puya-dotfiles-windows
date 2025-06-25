@@ -87,13 +87,13 @@ fi
 
 log "🍺 Installing/upgrading packages with Homebrew Bundle..."
 save_step "homebrew_packages"
-if [[ -f "Brewfile" ]]; then
-  # Using --no-lock prevents issues if a Brewfile.lock exists and is out of date.
-  # We want to install based on the Brewfile definitions.
-  brew bundle --file=Brewfile
-  log "✅ Homebrew packages installed/updated via Brewfile"
+if [[ -f "$HOME/.Brewfile" ]]; then
+    # Using --no-lock prevents issues if a Brewfile.lock exists and is out of date.
+    # We want to install based on the Brewfile definitions.
+    brew bundle --file="$HOME/.Brewfile"
+    log "✅ Homebrew packages installed/updated via Brewfile"
 else
-  log "⚠️  No Brewfile found, installing core packages individually..."
+    log "⚠️  No Brewfile found, installing core packages individually..."
   brew install git gh asdf curl git-lfs
 fi
 
@@ -184,8 +184,8 @@ save_step "dotbot_linking"
 log "🔄 Loading new shell configuration for SSH setup..."
 if [[ -f ~/.zshrc ]]; then
   # Source the modular configs directly since we can't reload the full zshrc in bash
-  if [[ -f ~/zsh/exports.zsh ]]; then
-    source ~/zsh/exports.zsh
+  if [[ -f ~/.zsh/01-exports.zsh ]]; then
+    source ~/.zsh/01-exports.zsh
     log "✅ 1Password SSH agent configuration loaded"
   fi
 fi
@@ -233,6 +233,50 @@ if grep -q -E "^\s*signingkey\s*=\s*YOUR_SSH_PUBLIC_KEY_HERE" "$HOME/.gitconfig.
   fi
 else
     log "✅ SSH signing key already configured in ~/.gitconfig.local. Skipping."
+fi
+
+# Set up GitHub CLI authentication with 1Password
+log "🐙 Setting up GitHub CLI authentication with 1Password..."
+save_step "github_cli_auth"
+
+# Check if 1Password CLI is available and user is signed in
+if command -v op &> /dev/null; then
+  if op account list &> /dev/null; then
+    log "✅ 1Password CLI is available and signed in"
+    
+    # Check if GitHub plugin is already configured
+    if op plugin list | grep -q "github"; then
+      log "✅ GitHub CLI is already authenticated with 1Password"
+    else
+      log "🔧 Setting up GitHub CLI with 1Password shell plugin..."
+      log ""
+      log "This will:"
+      log "• Create/use a GitHub Personal Access Token in 1Password"
+      log "• Configure GitHub CLI to use 1Password for authentication"
+      log "• Enable biometric authentication for GitHub operations"
+      log ""
+      read -r -p "Do you want to set up GitHub CLI with 1Password? (Y/n): " setup_gh_auth
+      
+      if [[ "${setup_gh_auth}" =~ ^[Nn]$ ]]; then
+        log "⏭️  Skipping GitHub CLI 1Password setup"
+      else
+        log "🔧 Initializing GitHub plugin for 1Password..."
+        if op plugin init gh; then
+          log "✅ GitHub CLI plugin initialized successfully"
+          log "💡 You can now use 'gh' commands with biometric authentication"
+        else
+          log "⚠️  GitHub CLI plugin setup failed - you can set this up manually later"
+          log "💡 Run 'op plugin init gh' to set up GitHub CLI authentication"
+        fi
+      fi
+    fi
+  else
+    log "⚠️  1Password CLI is available but not signed in"
+    log "💡 Sign in to 1Password CLI first, then run 'op plugin init gh' for GitHub authentication"
+  fi
+else
+  log "⚠️  1Password CLI not found - GitHub CLI will use standard authentication"
+  log "💡 You can authenticate GitHub CLI manually with 'gh auth login'"
 fi
 
 # Install Oh My Zsh (if not present)
