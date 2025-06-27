@@ -207,7 +207,7 @@ check_symlink "$HOME/.tool-versions" "ASDF tool versions"
 # Check if zsh modules are properly linked
 if [[ -L "$HOME/.zsh" ]]; then
   check_pass "ZSH modules directory is symlinked"
-  for module in 01-exports 02-asdf 10-aliases 11-functions; do
+  for module in 01-exports 02-asdf 03-uv 10-aliases 11-functions; do
     if [[ -f "$HOME/.zsh/$module.zsh" ]]; then
       check_pass "ZSH module exists: $module.zsh"
     else
