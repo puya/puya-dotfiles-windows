@@ -1,136 +1,154 @@
 # 🧰 Puya's Dotfiles
 
-A personal collection of configuration files and setup tools for my development environment on macOS, powered by [`dotbot`](https://github.com/anishathalye/dotbot) and a robust setup script.
+A personal collection of configuration files and automation scripts for setting up a complete development environment on macOS. Powered by [Dotbot](https://github.com/anishathalye/dotbot) with robust setup automation and health monitoring.
 
-## ✨ Features
+## ✨ What This Repo Provides
 
-- **Fully Automated Setup**: A single `./init.sh` script installs Homebrew, all packages, and necessary tools.
-- **Declarative & Versioned**: `Brewfile` and `.tool-versions` define the entire environment.
-- **Robust & Resumable**: Setup includes step-tracking, logging, and can be re-run to fix issues.
-- **Self-Healing**: A `./doctor.sh` script validates the environment and helps diagnose problems.
-- **Always Up-to-Date**: A `./update-versions.sh` script keeps tools at their latest stable releases.
-- **Modular Shell**: Zsh configuration is split into clean, ordered, and extensible modules.
+- **🚀 One-Command Setup**: `./init.sh` installs everything from Homebrew to development tools
+- **📦 Declarative Package Management**: `Brewfile` defines all your system packages
+- **🔧 Version-Controlled Environment**: `.tool-versions` locks Python, Node.js, and other tool versions
+- **🔐 Secure Authentication**: Integrated 1Password SSH agent for Git signing and GitHub CLI
+- **🩺 Self-Healing**: `./doctor.sh` validates your environment and diagnoses issues
+- **⬆️ Stay Current**: `./update-versions.sh` keeps tools at their latest stable releases
+- **🐚 Modular Shell Config**: Clean, ordered zsh configuration with useful aliases and functions
 
 ## 🚀 Quick Setup
 
-The `init.sh` script will guide you through the entire setup. On a new machine, it only takes two commands:
+Clone and run on any new Mac:
 
 ```bash
 git clone --recursive git@github.com:puya/puya-dotfiles.git ~/dotfiles
 cd ~/dotfiles && ./init.sh
 ```
 
-The script is idempotent, meaning you can safely run `./init.sh` again at any time to install missing tools or fix issues.
+**That's it!** The script handles everything: Homebrew, packages, development tools, SSH keys, and shell configuration.
 
-## ⚡ Simple Setup Flow
+> 💡 **First time?** Definitely read through [`DEV-SETUP.md`](DEV-SETUP.md) to understand all the tools, aliases, and functions available in your new environment!
 
-This is what the `init.sh` script automates for you:
+## 🗂️ Repository Structure
 
-1.  **🚀 Run Setup**: The script installs Homebrew, all packages from the `Brewfile`, and all `asdf` tool plugins.
-2.  **🔐 GitHub CLI Setup**: The script offers to configure GitHub CLI with 1Password for biometric authentication.
-3.  **⏸️ SSH Key Setup**: If needed, the script helps you configure SSH signing keys from 1Password.
-4.  **✅ You're Done**: Restart your terminal to enjoy the new environment with secure, biometric authentication!
+### 📝 Configuration Files
+- `.zshrc` - Main shell configuration (auto-sources modular configs)
+- `.gitconfig` - Git settings with 1Password SSH signing
+- `.tool-versions` - Version-locked development tools (Python, Node.js, etc.)
+- `Brewfile` - Declarative package management for Homebrew
 
-## 🛠️ Core Scripts
+### 🔧 Setup Scripts
+- `init.sh` - **Main setup script** - installs and configures everything
+- `setup-github-cli.sh` - Configure GitHub CLI with 1Password authentication
+- `setup-ssh-signing.sh` - Interactive SSH signing setup helper
+- `doctor.sh` - Environment health checker and diagnostics
+- `update-versions.sh` - Update tool versions to latest stable releases
 
-Your environment is managed by four key scripts:
+### 🐚 Modular Shell Configuration (`zsh/`)
+- `01-exports.zsh` - Environment variables and PATH setup
+- `02-asdf.zsh` - ASDF version manager initialization  
+- `03-uv.zsh` - UV Python tooling configuration
+- `05-optional-paths.zsh` - Device-specific tool paths (like john-jumbo)
+- `10-aliases.zsh` - Command shortcuts and modern tool replacements
+- `11-functions.zsh` - Useful shell functions
 
--   `./init.sh`: **Installs and configures everything.** This is the main script to run on a new machine or to repair your existing setup.
--   `./setup-github-cli.sh`: **Configure GitHub CLI authentication.** Choose between 1Password shell plugin or SSH authentication.
--   `./doctor.sh`: **Checks environment health.** Run this anytime to validate that all tools, paths, and symlinks are correctly configured.
--   `./update-versions.sh`: **Updates tool versions.** This script checks for the latest stable releases of the tools in `.tool-versions` and updates the file for you. Run `asdf install` afterwards to apply the changes.
+### 📋 Templates & Examples
+- `templates/gitconfig.local.example` - Git local configuration template
+- `install.conf.yaml` - Dotbot linking configuration
 
-## 🐚 Modular Shell Configuration
+## 🛠️ Key Scripts Explained
 
-The Zsh configuration is split into modules loaded in a specific order to ensure dependencies are met (e.g., environment variables are set before other scripts use them).
+### `./init.sh` - Complete Environment Setup
+- Installs Homebrew and all packages from `Brewfile`
+- Sets up ASDF and installs all tools from `.tool-versions`  
+- Links dotfiles using Dotbot
+- Configures 1Password SSH agent for Git signing
+- Sets up GitHub CLI with biometric authentication
+- Installs Oh My Zsh with modular configuration
+- Runs health check to verify everything works
 
--   `zsh/01-exports.zsh`: Environment variables, `PATH` setup, and 1Password agent.
--   `zsh/02-asdf.zsh`: ASDF version manager initialization.
--   `zsh/10-aliases.zsh`: Command shortcuts and modern aliases (e.g., `ls` -> `eza`).
--   `zsh/11-functions.zsh`: Useful shell functions.
+### `./doctor.sh` - Environment Health Check
+Run anytime to validate your setup:
+- ✅ System information and shell configuration
+- ✅ Homebrew packages and health
+- ✅ Development tools (Git, GitHub CLI, ASDF)
+- ✅ Language environments (Python, Node.js)
+- ✅ Dotfiles linking and SSH authentication
 
-The numbering scheme leaves room for future expansion. Critical setup files are numbered `01-09`, while user-facing configs are `10-19`.
+### `./update-versions.sh` - Keep Tools Current
+- Checks for latest stable versions of tools in `.tool-versions`
+- Smart handling: Node.js LTS, Python stable (no experimental builds)
+- Updates file automatically - run `asdf install` to apply changes
 
-### 🚧 Future Enhancements Under Consideration
+## 🔐 Security Features
 
-**Modern ZSH Framework Alternatives:**
-- **[ZAP](https://github.com/zap-zsh/zap)**: Minimal, fast ZSH plugin manager as alternative to Oh My Zsh
-- **[ZAP Supercharge](https://github.com/zap-zsh/supercharge)**: Enhanced ZSH experience with auto-CD, interactive completions, and quality-of-life improvements
-- **[Powerlevel10k](https://github.com/romkatv/powerlevel10k)**: Ultra-fast, feature-rich ZSH theme (framework-agnostic, works with current setup)
-- **Performance**: ZAP offers 3-5x faster startup times compared to Oh My Zsh while maintaining compatibility with OMZ plugins
+- **1Password SSH Agent**: All SSH keys stored securely in 1Password with biometric authentication
+- **Git Commit Signing**: Automatic SSH-based commit signing via 1Password
+- **GitHub CLI Integration**: Biometric authentication for GitHub operations
+- **No Plaintext Secrets**: All sensitive data managed through 1Password
 
-## 📦 Package Management
+## 📦 What Gets Installed
 
-Your system packages are managed declaratively via the `Brewfile`. Here are some useful commands:
+**Core Development Environment:**
+- **Package Manager**: Homebrew with declarative `Brewfile`
+- **Version Manager**: ASDF for Python, Node.js, Poetry, UV
+- **Python Stack**: Both Poetry (project management) and UV (fast tooling)
+- **Modern CLI Tools**: `eza`, `bat`, `ripgrep`, `fd`, `diff-so-fancy`
+- **Authentication**: 1Password CLI and SSH agent integration
 
--   `brew bundle`: Installs all packages listed in the `Brewfile`. The `init.sh` script runs this automatically.
--   `brew bundle dump --force`: Overwrites your `Brewfile` with a list of all currently installed packages.
--   `brew bundle check`: Shows which packages from your `Brewfile` are missing.
+**Shell Enhancement:**
+- **Oh My Zsh**: Framework with Git and ASDF plugins
+- **Modular Config**: Organized, numbered modules for clean loading order
+- **Useful Aliases**: Git shortcuts, modern tool replacements, development helpers
+- **Shell Functions**: `mkcd`, `extract`, `killport`, `newproject`, and more
 
-## 🔐 Git & SSH Signing
+> 📖 **See [`DEV-SETUP.md`](DEV-SETUP.md) for complete tool documentation, aliases reference, and development workflow tips!**
 
-The `init.sh` script handles the interactive setup of your SSH signing key. However, if you need to troubleshoot or re-configure it, the `./setup-ssh-signing.sh` script can guide you by checking your 1Password agent and listing available keys.
-
-Your main `.gitconfig` is set up to include a machine-specific `~/.gitconfig.local` file. This is where your signing key and other local settings are stored, keeping them separate from your public dotfiles.
-
-## 🐙 GitHub CLI Authentication
-
-The GitHub CLI (`gh`) can be authenticated in two ways with your existing 1Password setup:
-
-### Option 1: 1Password Shell Plugin (Recommended)
-- Uses a Personal Access Token stored securely in 1Password
-- Biometric authentication for each GitHub operation
-- Seamless integration with your existing 1Password workflow
-
-### Option 2: SSH Authentication  
-- Leverages your existing SSH keys from 1Password SSH agent
-- No separate token needed
-- Uses the same SSH setup as Git operations
-
-**Automatic Setup:**
-The `./init.sh` script now includes GitHub CLI setup and will offer to configure it for you during the main setup process.
-
-**Manual Setup:**
-```bash
-# Interactive setup script
-./setup-github-cli.sh
-
-# Or configure manually:
-# Option 1: 1Password Shell Plugin (Recommended)
-op plugin init gh
-
-# Option 2: SSH Authentication
-gh auth login -p ssh
-```
-
-**How it Works:**
-- **1Password Shell Plugin**: Uses biometric authentication (Touch ID/Face ID) for each GitHub operation
-- **Personal Access Token**: Stored securely in 1Password, never touches your filesystem
-- **Seamless Integration**: Works with your existing 1Password workflow
-
-## 🩺 Health Check
-
-After setup or anytime you suspect an issue, run the health check script:
+## 🔄 Maintenance Commands
 
 ```bash
+# Check environment health
 ./doctor.sh
+
+# Update tool versions to latest
+./update-versions.sh && asdf install
+
+# Update Homebrew packages  
+brew bundle               # Install missing packages
+brewup                    # Update all packages (alias)
+brew bundle dump --force  # Regenerate Brewfile from installed packages
+
+# Reconfigure authentication
+./setup-github-cli.sh     # GitHub CLI setup
+./setup-ssh-signing.sh    # SSH signing setup
 ```
 
-This will validate your entire environment, including:
--   All required tools are installed and working.
--   Dotfiles are properly symlinked.
--   Version managers are configured correctly.
--   Git and SSH authentication is set up.
--   GitHub CLI authentication status.
+## 🆘 Troubleshooting
 
-## 🛠️ Error Recovery
+**Setup failed?** The scripts are resumable:
+- Check `~/.dotfiles-setup.log` for detailed error logs
+- Simply run `./init.sh` again - it picks up where it left off
+- Use `./doctor.sh` to identify specific issues
 
-The setup script is built to be robust and includes:
+**Missing tools?** 
+- Run `brew bundle` to install missing Homebrew packages
+- Run `asdf install` to install missing development tools
 
--   **Logging**: All output is logged to `~/.dotfiles-setup.log` for easy debugging.
--   **Step Tracking**: If the setup fails, it saves the last step. You can simply re-run the script to resume from where you left off.
--   **Platform Detection**: Automatically handles differences between Apple Silicon and Intel Macs.
+**Authentication issues?**
+- Ensure 1Password desktop app is running and SSH agent is enabled
+- Use setup scripts: `./setup-ssh-signing.sh` or `./setup-github-cli.sh`
 
 ---
 
-*This setup is actively maintained and updated.*
+### 🚧 Future Enhancements Under Consideration
+**Modern ZSH Framework Alternatives:**
+- **[ZAP](https://github.com/zap-zsh/zap)**: Minimal, fast ZSH plugin manager as 
+alternative to Oh My Zsh
+- **[ZAP Supercharge](https://github.com/zap-zsh/supercharge)**: Enhanced ZSH experience 
+with auto-CD, interactive completions, and quality-of-life improvements
+- **[Powerlevel10k](https://github.com/romkatv/powerlevel10k)**: Ultra-fast, 
+feature-rich ZSH theme (framework-agnostic, works with current setup)
+- **Performance**: ZAP offers 3-5x faster startup times compared to Oh My Zsh while 
+maintaining compatibility with OMZ plugins
+
+---
+
+This dotfiles repository is actively maintained and battle-tested across multiple development environments. The modular approach makes it easy to customize while keeping the core functionality robust.
+
+**Ready to explore your new environment?** → Read [`DEV-SETUP.md`](DEV-SETUP.md)
