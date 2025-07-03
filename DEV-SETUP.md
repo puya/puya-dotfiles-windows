@@ -204,6 +204,7 @@ op plugin inspect gh     # View 1Password plugin configuration
 - **Node.js LTS** - Latest Long Term Support version
 - **Deno 2.4.0** - Modern TypeScript-first runtime
 - **Bun 1.2.17** - Ultra-fast JavaScript runtime & toolkit
+- **Rust 1.88.0** - Systems programming language with a focus on safety and performance
 - **Poetry 2.1.3** - Python dependency management
 - **UV 0.7.15** - Ultra-fast Python tooling
 

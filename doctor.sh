@@ -359,6 +359,26 @@ else
 fi
 
 # -------------------------------
+# 🦀 RUST CHECKS
+# -------------------------------
+
+print_header "Rust Environment"
+check_command "rustc" "Rust Compiler"
+check_command "cargo" "Cargo"
+
+if command -v rustc &> /dev/null; then
+  rust_version=$(rustc --version | awk '{print $2}')
+  expected_version=$(grep "^rust" ~/.tool-versions 2>/dev/null | awk '{print $2}')
+  if [[ -n "$expected_version" ]]; then
+    if [[ "$expected_version" == "$rust_version"* ]]; then
+      check_pass "Rust version matches .tool-versions: $rust_version"
+    else
+      check_warn "Rust version mismatch. Expected: $expected_version, Got: $rust_version"
+    fi
+  fi
+fi
+
+# -------------------------------
 # 📊 SUMMARY
 # -------------------------------
 
