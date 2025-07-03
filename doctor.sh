@@ -153,6 +153,38 @@ check_command "pip" "pip" false
 check_command "poetry" "Poetry"
 check_command "uv" "uv"
 
+# -------------------------------
+# 🟣 JAVASCRIPT RUNTIMES
+# -------------------------------
+
+print_header "JavaScript Runtimes"
+check_command "deno" "Deno"
+check_command "bun" "Bun"
+
+if command -v deno &> /dev/null; then
+  deno_version=$(deno --version | head -1 | awk '{print $2}')
+  expected_version=$(grep "^deno" ~/.tool-versions 2>/dev/null | awk '{print $2}')
+  if [[ -n "$expected_version" ]]; then
+    if [[ "$expected_version" == "$deno_version" ]]; then
+      check_pass "Deno version matches .tool-versions: $deno_version"
+    else
+      check_warn "Deno version mismatch. Expected: $expected_version, Got: $deno_version"
+    fi
+  fi
+fi
+
+if command -v bun &> /dev/null; then
+  bun_version=$(bun --version)
+  expected_version=$(grep "^bun" ~/.tool-versions 2>/dev/null | awk '{print $2}')
+  if [[ -n "$expected_version" ]]; then
+    if [[ "$expected_version" == "$bun_version" ]]; then
+      check_pass "Bun version matches .tool-versions: $bun_version"
+    else
+      check_warn "Bun version mismatch. Expected: $expected_version, Got: $bun_version"
+    fi
+  fi
+fi
+
 if command -v python &> /dev/null; then
   python_version=$(python --version 2>&1 | awk '{print $2}')
   expected_version=$(grep "^python" ~/.tool-versions 2>/dev/null | awk '{print $2}')

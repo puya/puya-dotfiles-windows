@@ -103,6 +103,44 @@ uv pip install requests    # Fast package installation
 
 ---
 
+## 🟨 JavaScript/TypeScript Development
+
+Multiple JavaScript runtimes for different use cases:
+
+### Node.js - Traditional Runtime
+```bash
+node app.js                # Run JavaScript file
+npm install                # Install dependencies
+npm run dev               # Run development script
+npx create-react-app .    # Run packages without installing
+```
+
+### Deno - Modern Secure Runtime
+```bash
+deno run app.ts           # Run TypeScript directly (no compilation step)
+deno run --allow-net app.ts  # Run with network permissions
+deno test                 # Built-in test runner
+deno fmt                  # Built-in formatter
+deno lint                 # Built-in linter
+deno install script.ts    # Install executable scripts
+```
+
+### Bun - Ultra-Fast Runtime
+```bash
+bun run app.ts            # Run TypeScript 3x faster than Node
+bun install               # Install packages (much faster than npm)
+bun test                  # Built-in fast test runner
+bun build app.ts          # Built-in bundler
+bunx create-react-app .   # Run packages without installing (faster than npx)
+```
+
+**When to use which:**
+- **Node.js**: Existing projects, maximum ecosystem compatibility
+- **Deno**: New projects prioritizing security and modern standards
+- **Bun**: Performance-critical applications and faster development workflows
+
+---
+
 ## 📦 Package & Version Management
 
 ### ASDF - Universal Version Manager
@@ -164,6 +202,8 @@ op plugin inspect gh     # View 1Password plugin configuration
 ### Language Environments
 - **Python 3.13.5** - Latest stable Python
 - **Node.js LTS** - Latest Long Term Support version
+- **Deno 2.4.0** - Modern TypeScript-first runtime
+- **Bun 1.2.17** - Ultra-fast JavaScript runtime & toolkit
 - **Poetry 2.1.3** - Python dependency management
 - **UV 0.7.15** - Ultra-fast Python tooling
 
