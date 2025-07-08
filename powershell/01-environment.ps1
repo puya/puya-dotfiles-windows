@@ -15,6 +15,9 @@ if (-not ($env:PATH -like "*$ScoopShimPath*")) {
 
 # --- Environment Variables ---
 $env:EDITOR = "code --wait"
+$env:GIT_SSH = "C:/WINDOWS/System32/OpenSSH/ssh.exe"
 
 # --- Status Message ---
-Write-Host "🔧 Custom environment loaded." -ForegroundColor Cyan 
+if ($Host.Name -eq 'ConsoleHost') {
+    Write-Host "🔧 Custom environment loaded." -ForegroundColor Cyan
+} 

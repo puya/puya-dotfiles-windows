@@ -6,7 +6,7 @@ Your complete guide to the tools, aliases, functions, and workflows available in
 
 -   **OS**: Windows with Scoop package management
 -   **Shell**: PowerShell 7+
--   **Terminal**: Windows Terminal (or VS Code/Cursor) with a Nerd Font (`CaskaydiaCove NF`)
+-   **Terminal**: Windows Terminal (or VS Code/Cursor) with a Nerd Font (`Cascadia Code NF`)
 -   **Prompt**: Oh My Posh for a themed, Git-aware prompt
 -   **Authentication**: 1Password SSH agent for secure, biometric authentication
 -   **Version Management**: `mise` for consistent tool versions across projects

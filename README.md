@@ -35,11 +35,91 @@ cd $HOME\dotfiles
 The script handles everything: Scoop, packages, development tools, and your PowerShell profile.
 
 ### 3. **IMPORTANT**: Set Terminal Font
-To see the icons in your prompt correctly, you must configure your terminal to use a Nerd Font. The setup script installs **`Cascadia-Code`**, which includes `CaskaydiaCove NF`.
+To see the icons in your prompt correctly, you must configure your terminals to use a Nerd Font. The setup script installs **`Cascadia-Code`**, which provides the **`Cascadia Code NF`** font face.
 
--   **Windows Terminal**: `Settings` > `Profiles` > `PowerShell` > `Appearance` > Font face: **`CaskaydiaCove NF`**.
--   **VS Code/Cursor**: `Settings` > Search for `terminal font` > Font Family: **`CaskaydiaCove NF`**.
--   Restart your terminal after changing the font.
+**For Windows Terminal:**
+1.  Open Windows Terminal and go to `Settings` (you can use the dropdown or press `Ctrl + ,`).
+2.  Select the **PowerShell** profile from the list on the left.
+3.  Go to the **Appearance** tab.
+4.  Under the **Font face** dropdown, select **`Cascadia Code NF`**.
+5.  Click **Save**.
+
+**For VS Code / Cursor:**
+1.  Open VS Code or Cursor and go to `Settings` (you can use `File > Preferences > Settings` or press `Ctrl + ,`).
+2.  In the search bar, type `terminal.integrated.fontFamily`.
+3.  In the text box, enter **`Cascadia Code NF`**.
+4.  Restart the terminal instance or the application for the change to take full effect.
+    - To make this setting apply to all profiles, you can also add it to your `settings.json` file like this:
+    ```json
+    "terminal.integrated.fontFamily": "Cascadia Code NF"
+    ```
+
+## 🚀 Installation
+
+Setting up your environment is an automated process, but it requires a few manual prerequisite steps to bootstrap the system.
+
+### Step 0: Prerequisites
+
+Before running the automated setup, you must manually install the following core tools using `winget` in the default Windows PowerShell.
+
+1.  **Install Windows Terminal (Recommended)**
+    ```powershell
+    winget install Microsoft.WindowsTerminal
+    ```
+
+2.  **Install PowerShell 7**
+    *This is the most important step, as the setup script requires it.*
+    ```powershell
+    winget install Microsoft.PowerShell
+    ```
+
+3.  **Install Git**
+    *Required to download the dotfiles repository.*
+    ```powershell
+    winget install Git.Git
+    ```
+
+After these are installed, **close the current terminal and open a new PowerShell 7 terminal** to continue.
+
+### Step 1: Clone the Repository
+
+```powershell
+# Set execution policy to allow local scripts to run for the current session
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+
+# Clone the repository
+git clone https://github.com/puyalk/puya-dotfiles.git $HOME\dotfiles
+```
+
+### 2. Run the Initialization Script
+This is the main step that automates the entire setup.
+
+```powershell
+# Navigate to the dotfiles directory and run the setup
+cd $HOME\dotfiles
+.\init.ps1
+```
+The script handles everything: Scoop, packages, development tools, and your PowerShell profile.
+
+### 3. **IMPORTANT**: Set Terminal Font
+To see the icons in your prompt correctly, you must configure your terminals to use a Nerd Font. The setup script installs **`Cascadia-Code`**, which provides the **`Cascadia Code NF`** font face.
+
+**For Windows Terminal:**
+1.  Open Windows Terminal and go to `Settings` (you can use the dropdown or press `Ctrl + ,`).
+2.  Select the **PowerShell** profile from the list on the left.
+3.  Go to the **Appearance** tab.
+4.  Under the **Font face** dropdown, select **`Cascadia Code NF`**.
+5.  Click **Save**.
+
+**For VS Code / Cursor:**
+1.  Open VS Code or Cursor and go to `Settings` (you can use `File > Preferences > Settings` or press `Ctrl + ,`).
+2.  In the search bar, type `terminal.integrated.fontFamily`.
+3.  In the text box, enter **`Cascadia Code NF`**.
+4.  Restart the terminal instance or the application for the change to take full effect.
+    - To make this setting apply to all profiles, you can also add it to your `settings.json` file like this:
+    ```json
+    "terminal.integrated.fontFamily": "Cascadia Code NF"
+    ```
 
 ## 🗂️ Repository Structure
 
@@ -64,3 +144,28 @@ This environment is designed to use 1Password for securely managing SSH keys for
 -   **Script failed?** The `init.ps1` script is designed to be resumable. Simply run it again.
 -   **Missing icons in prompt?** Make sure you have set the font to `CaskaydiaCove NF` in your terminal's settings (Step 3 above).
 -   **Missing commands?** Close and restart your terminal. If that doesn't work, run `doctor.ps1` to diagnose the issue. 
+-   **PowerShell Extension crashing in VS Code/Cursor?** This can happen if your profile tries to run interactive commands. The profile is designed to prevent this, but if you've added custom commands, ensure they are wrapped in `if ($Host.Name -eq 'ConsoleHost') { ... }`. 
+
+## 🔧 Maintenance
+
+### Updating PowerShell and Other Core Tools
+
+Since core tools like PowerShell and Git were installed manually via `winget`, you should use `winget` to update them.
+
+```powershell
+# To update PowerShell
+winget upgrade Microsoft.PowerShell
+
+# To update Git
+winget upgrade Git.Git
+```
+
+### Updating Scoop-Managed Apps
+
+For all the applications installed by the `init.ps1` script (via `scoopfile.json`), you can update them all at once using Scoop's built-in update command:
+
+```powershell
+scoop update *
+```
+
+This will check for new versions of all your tools like `mise`, `gh`, `nvm`, etc., and install them. 

@@ -38,8 +38,7 @@ if (Get-Command mise -ErrorAction SilentlyContinue) {
 
 # --- Initialize Oh My Posh ---
 # This makes the prompt look nice. It should be the very last thing to run.
-if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
+if ($Host.Name -eq 'ConsoleHost' -and (Get-Command oh-my-posh -ErrorAction SilentlyContinue)) {
     oh-my-posh init pwsh --config '$env:POSH_THEMES_PATH\jandedobbeleer.omp.json' | Invoke-Expression
-}
-
-Write-Host "✅ PowerShell profile loaded." -ForegroundColor Green 
+    Write-Host "✅ PowerShell profile loaded." -ForegroundColor Green
+} 

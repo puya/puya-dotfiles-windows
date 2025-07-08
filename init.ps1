@@ -89,9 +89,8 @@ function Install-ScoopApps {
         return
     }
 
-    # Bootstrap by installing git first, as it's needed for buckets
-    Write-Log "Bootstrapping Scoop with git..."
-    scoop install git
+    # Git is now a prerequisite installed via winget. We no longer need to install it here.
+    # Scoop will automatically find and use the system's Git for managing buckets.
 
     try {
         # The 'directory' command requires the 'extras' bucket
