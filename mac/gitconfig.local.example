@@ -11,16 +11,19 @@
 # Good defaults enabled
 [core]
   editor = cursor          # Use Cursor as default editor
-  autocrlf = true         # Handle line endings properly on Windows
+  autocrlf = input         # Handle line endings properly on macOS/Linux
   
 [push]
   default = simple         # Only push current branch
   autoSetupRemote = true   # Automatically set up remote tracking
 
 [pull]
-  rebase = true            # Use rebase instead of merge when pulling
+  rebase = true           # Use rebase instead of merge when pulling
 
-# --- Useful Aliases (Universal) ---
+[credential]
+  helper = osxkeychain    # Use macOS keychain for credentials
+
+# Useful aliases enabled by default
 [alias]
   co = checkout
   br = branch
@@ -32,7 +35,7 @@
   amend = commit --amend --no-edit
   undo = reset --soft HEAD~1
   
-# --- Diff & Merge Tool (Universal, for VS Code/Cursor) ---
+# Diff and merge tools (VS Code/Cursor integration)
 [merge]
   tool = vscode
 [mergetool "vscode"]
@@ -41,4 +44,10 @@
 [diff]
   tool = vscode
 [difftool "vscode"]
-  cmd = code --wait --diff $LOCAL $REMOTE 
+  cmd = code --wait --diff $LOCAL $REMOTE
+
+# Optional: Uncomment for work vs personal GitHub accounts
+# [url "git@github.com-work:"]
+#   insteadOf = git@github.com:
+# [url "git@github.com-personal:"]
+#   insteadOf = git@github.com: 

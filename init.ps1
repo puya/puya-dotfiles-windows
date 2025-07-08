@@ -259,6 +259,41 @@ function Install-PipxTools {
     }
 }
 
+# --- Function to Configure Git Signing ---
+function Configure-GitSigning {
+    Write-Log "Configuring Git for 1Password SSH signing..."
+
+    # Find the 1Password SSH signing executable
+    $OnePasswordPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "1Password\app"
+    if (-not (Test-Path $OnePasswordPath)) {
+        Write-Log "Could not find 1Password directory at $OnePasswordPath. Skipping Git signing setup." -Level "WARN"
+        return
+    }
+
+    $SignerExe = Get-ChildItem -Path $OnePasswordPath -Recurse -Filter "op-ssh-sign.exe" | Select-Object -First 1
+    if ($null -eq $SignerExe) {
+        Write-Log "Could not find 'op-ssh-sign.exe' in $OnePasswordPath. Skipping Git signing setup." -Level "WARN"
+        return
+    }
+
+    $SignerPath = $SignerExe.FullName
+    Write-Log "Found 1Password signer at: $SignerPath"
+
+    try {
+        # Set the GPG format to SSH
+        git config --global gpg.format ssh
+        # Set the GPG SSH program to the 1Password signer with a full, absolute path
+        git config --global gpg.ssh.program $SignerPath
+        # Enable commit signing by default
+        git config --global commit.gpgsign true
+
+        Write-Log "✅ Git signing configured successfully."
+    } catch {
+        Write-Log "An error occurred while configuring Git signing." -Level "ERROR"
+        Write-Log $_.Exception.Message -Level "ERROR"
+    }
+}
+
 Write-Log "🚀 Starting Windows dotfiles setup..."
 
 # -----------------------------------------------------------------------------
@@ -309,10 +344,13 @@ try {
 
 Install-PipxTools
 
+# 6. Configure Git Signing
+Write-Log "Step 6: Configuring Git Signing..."
+Configure-GitSigning
 
-# 6. Final setup and verification
+# 7. Final setup and verification
 #    - Run health checks and provide next steps.
-Write-Log "Step 6: Finalizing setup..."
+Write-Log "Step 7: Finalizing setup..."
 
 if ($ScriptHasErrored) {
     Write-Host "`n"
