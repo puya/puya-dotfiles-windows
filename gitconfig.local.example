@@ -1,29 +1,53 @@
-# Git Local Configuration
-# This file is machine-specific and should NOT be committed to your dotfiles repo
-# IMPORTANT: Replace YOUR_SSH_PUBLIC_KEY_HERE with your actual SSH key from 1Password
+# -----------------------------------------------------------------------------
+# Git Local Configuration for Windows
+# This file is machine-specific and should NOT be committed.
+# On a new machine, copy this to ~/.gitconfig.local and fill in the details.
+# -----------------------------------------------------------------------------
 
+# --- User Identity (Required) ---
 [user]
-  # REQUIRED: Replace with your SSH signing key from 1Password
+  name = Your Name
+  email = your.email@example.com
+
+  # --- Commit Signing Key (Required for 1Password) ---
   # Get this by running: ssh-add -L
+  # This will list keys from your 1Password agent.
   # Example: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHlourExampleKey... user@example.com
   signingkey = YOUR_SSH_PUBLIC_KEY_HERE
 
-# Good defaults enabled
+# --- Global Commit Signing Settings ---
+[commit]
+  # Enables commit signing for all repositories on this machine.
+  gpgsign = true
+
+[gpg]
+  # Tells Git to use SSH keys for signing.
+  format = ssh
+
+# --- 1Password SSH Signing Program for Windows ---
+[gpg "ssh"]
+  # Note the '.exe' extension and the path for Windows.
+  program = "$env:LOCALAPPDATA\\1Password\\app\\8\\op-ssh-sign.exe"
+
+# --- Credential Helper for Windows ---
+[credential]
+  # Use the Git Credential Manager, which is the standard for Windows
+  # and integrates with Windows Credential Manager.
+  helper = manager
+
+# --- Good Defaults (Universal) ---
 [core]
-  editor = cursor          # Use Cursor as default editor
-  autocrlf = input         # Handle line endings properly on macOS/Linux
-  
+  editor = "code --wait"   # Use VS Code/Cursor as default editor
+  autocrlf = true          # Handle line endings properly on Windows
+
 [push]
   default = simple         # Only push current branch
   autoSetupRemote = true   # Automatically set up remote tracking
 
 [pull]
-  rebase = true           # Use rebase instead of merge when pulling
+  rebase = true            # Use rebase instead of merge when pulling
 
-[credential]
-  helper = osxkeychain    # Use macOS keychain for credentials
-
-# Useful aliases enabled by default
+# --- Useful Aliases (Universal) ---
 [alias]
   co = checkout
   br = branch
@@ -35,7 +59,7 @@
   amend = commit --amend --no-edit
   undo = reset --soft HEAD~1
   
-# Diff and merge tools (VS Code/Cursor integration)
+# --- Diff & Merge Tool (Universal, for VS Code/Cursor) ---
 [merge]
   tool = vscode
 [mergetool "vscode"]
@@ -44,10 +68,4 @@
 [diff]
   tool = vscode
 [difftool "vscode"]
-  cmd = code --wait --diff $LOCAL $REMOTE
-
-# Optional: Uncomment for work vs personal GitHub accounts
-# [url "git@github.com-work:"]
-#   insteadOf = git@github.com:
-# [url "git@github.com-personal:"]
-#   insteadOf = git@github.com: 
+  cmd = code --wait --diff $LOCAL $REMOTE 

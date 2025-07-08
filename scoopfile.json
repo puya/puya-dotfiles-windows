@@ -1,0 +1,22 @@
+{
+    "buckets": [
+        "extras",
+        "nerd-fonts"
+    ],
+    "apps": [
+        "git",
+        "gh",
+        "1password-cli",
+        "oh-my-posh",
+        "mise",
+        "eza",
+        "bat",
+        "ripgrep",
+        "fd",
+        "fzf",
+        "jq",
+        "unzip",
+        "diff-so-fancy",
+        "Cascadia-Code"
+    ]
+} 

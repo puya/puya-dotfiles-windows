@@ -1,154 +1,66 @@
-# 🧰 Puya's Dotfiles
+# 🧰 Puya's Dotfiles for Windows
 
-A personal collection of configuration files and automation scripts for setting up a complete development environment on macOS. Powered by [Dotbot](https://github.com/anishathalye/dotbot) with robust setup automation and health monitoring.
+A personal collection of configuration files and automation scripts for setting up a complete development environment on **Windows**, powered by PowerShell. This setup uses **Scoop** for package management and **mise** for tool version management.
 
 ## ✨ What This Repo Provides
 
-- **🚀 One-Command Setup**: `./init.sh` installs everything from Homebrew to development tools
-- **📦 Declarative Package Management**: `Brewfile` defines all your system packages
-- **🔧 Version-Controlled Environment**: `.tool-versions` locks Python, Node.js, and other tool versions
-- **🔐 Secure Authentication**: Integrated 1Password SSH agent for Git signing and GitHub CLI
-- **🩺 Self-Healing**: `./doctor.sh` validates your environment and diagnoses issues
-- **⬆️ Stay Current**: `./update-versions.sh` keeps tools at their latest stable releases
-- **🐚 Modular Shell Config**: Clean, ordered zsh configuration with useful aliases and functions
+-   **🚀 One-Command Setup**: `.\init.ps1` installs and configures everything from system packages to your PowerShell profile.
+-   **📦 Declarative Management**: `scoopfile.json` for system packages and `.tool-versions` for language runtimes.
+-   **🎨 Gorgeous Terminal**: A customized prompt via Oh My Posh, with icons provided by an auto-installed Nerd Font.
+-   **🐚 Modern Shell**: A modular PowerShell profile with useful aliases (`ls` → `eza`, `cat` → `bat`) and helper functions.
+-   **💻 Works Everywhere**: The profile is robustly designed to work in both Windows Terminal and integrated terminals (VS Code, Cursor).
+-   **🩺 Health Checks**: A `doctor.ps1` script to validate your environment and check for issues.
 
-## 🚀 Quick Setup
+## 🚀 Setup Instructions
 
-Clone and run on any new Mac:
+### 1. Initial Clone
+On a new Windows machine, open PowerShell and run:
 
-```bash
-git clone --recursive git@github.com:puya/puya-dotfiles.git ~/dotfiles
-cd ~/dotfiles && ./init.sh
+```powershell
+# Set execution policy to allow local scripts to run for the current session
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+
+# Clone the repository
+git clone https://github.com/puyalk/puya-dotfiles.git $HOME\dotfiles
 ```
 
-**That's it!** The script handles everything: Homebrew, packages, development tools, SSH keys, and shell configuration.
+### 2. Run the Initialization Script
+This is the main step that automates the entire setup.
 
-> 💡 **First time?** Definitely read through [`DEV-SETUP.md`](DEV-SETUP.md) to understand all the tools, aliases, and functions available in your new environment!
+```powershell
+# Navigate to the dotfiles directory and run the setup
+cd $HOME\dotfiles
+.\init.ps1
+```
+The script handles everything: Scoop, packages, development tools, and your PowerShell profile.
+
+### 3. **IMPORTANT**: Set Terminal Font
+To see the icons in your prompt correctly, you must configure your terminal to use a Nerd Font. The setup script installs **`Cascadia-Code`**, which includes `CaskaydiaCove NF`.
+
+-   **Windows Terminal**: `Settings` > `Profiles` > `PowerShell` > `Appearance` > Font face: **`CaskaydiaCove NF`**.
+-   **VS Code/Cursor**: `Settings` > Search for `terminal font` > Font Family: **`CaskaydiaCove NF`**.
+-   Restart your terminal after changing the font.
 
 ## 🗂️ Repository Structure
 
-### 📝 Configuration Files
-- `.zshrc` - Main shell configuration (auto-sources modular configs)
-- `.gitconfig` - Git settings with 1Password SSH signing
-- `.tool-versions` - Version-locked development tools (Python, Node.js, etc.)
-- `Brewfile` - Declarative package management for Homebrew
+-   `init.ps1`: **Main setup script.**
+-   `doctor.ps1`: Validates the environment setup.
+-   `update-versions.ps1`: Helper script to update language versions in `.tool-versions`.
+-   `scoopfile.json`: Declarative list of system packages managed by Scoop.
+-   `.tool-versions`: Version-locked development tools for `mise`.
+-   `powershell/`: Contains all modular PowerShell configuration files (`profile.ps1`, `01-environment.ps1`, `10-aliases.ps1`).
+-   `gitconfig`: Universal Git settings (linked to `$HOME\.gitconfig`).
 
-### 🔧 Setup Scripts
-- `init.sh` - **Main setup script** - installs and configures everything
-- `setup-github-cli.sh` - Configure GitHub CLI with 1Password authentication
-- `setup-ssh-signing.sh` - Interactive SSH signing setup helper
-- `doctor.sh` - Environment health checker and diagnostics
-- `update-versions.sh` - Update tool versions to latest stable releases
+## 🔐 Security & Authentication
 
-### 🐚 Modular Shell Configuration (`zsh/`)
-- `01-exports.zsh` - Environment variables and PATH setup
-- `02-asdf.zsh` - ASDF version manager initialization  
-- `03-uv.zsh` - UV Python tooling configuration
-- `05-optional-paths.zsh` - Device-specific tool paths (like john-jumbo)
-- `10-aliases.zsh` - Command shortcuts and modern tool replacements
-- `11-functions.zsh` - Useful shell functions
+This environment is designed to use 1Password for securely managing SSH keys for Git and GitHub authentication.
 
-### 📋 Templates & Examples
-- `templates/gitconfig.local.example` - Git local configuration template
-- `install.conf.yaml` - Dotbot linking configuration
-
-## 🛠️ Key Scripts Explained
-
-### `./init.sh` - Complete Environment Setup
-- Installs Homebrew and all packages from `Brewfile`
-- Sets up ASDF and installs all tools from `.tool-versions`  
-- Links dotfiles using Dotbot
-- Configures 1Password SSH agent for Git signing
-- Sets up GitHub CLI with biometric authentication
-- Installs Oh My Zsh with modular configuration
-- Runs health check to verify everything works
-
-### `./doctor.sh` - Environment Health Check
-Run anytime to validate your setup:
-- ✅ System information and shell configuration
-- ✅ Homebrew packages and health
-- ✅ Development tools (Git, GitHub CLI, ASDF)
-- ✅ Language environments (Python, Node.js)
-- ✅ Dotfiles linking and SSH authentication
-
-### `./update-versions.sh` - Keep Tools Current
-- Checks for latest stable versions of tools in `.tool-versions`
-- Smart handling: Node.js LTS, Python stable (no experimental builds)
-- Updates file automatically - run `asdf install` to apply changes
-
-## 🔐 Security Features
-
-- **1Password SSH Agent**: All SSH keys stored securely in 1Password with biometric authentication
-- **Git Commit Signing**: Automatic SSH-based commit signing via 1Password
-- **GitHub CLI Integration**: Biometric authentication for GitHub operations
-- **No Plaintext Secrets**: All sensitive data managed through 1Password
-
-## 📦 What Gets Installed
-
-**Core Development Environment:**
-- **Package Manager**: Homebrew with declarative `Brewfile`
-- **Version Manager**: ASDF for Python, Node.js, Poetry, UV
-- **Python Stack**: Both Poetry (project management) and UV (fast tooling)
-- **Modern CLI Tools**: `eza`, `bat`, `ripgrep`, `fd`, `diff-so-fancy`
-- **Authentication**: 1Password CLI and SSH agent integration
-
-**Shell Enhancement:**
-- **Oh My Zsh**: Framework with Git and ASDF plugins
-- **Modular Config**: Organized, numbered modules for clean loading order
-- **Useful Aliases**: Git shortcuts, modern tool replacements, development helpers
-- **Shell Functions**: `mkcd`, `extract`, `killport`, `newproject`, and more
-
-> 📖 **See [`DEV-SETUP.md`](DEV-SETUP.md) for complete tool documentation, aliases reference, and development workflow tips!**
-
-## 🔄 Maintenance Commands
-
-```bash
-# Check environment health
-./doctor.sh
-
-# Update tool versions to latest
-./update-versions.sh && asdf install
-
-# Update Homebrew packages  
-brew bundle               # Install missing packages
-brewup                    # Update all packages (alias)
-brew bundle dump --force  # Regenerate Brewfile from installed packages
-
-# Reconfigure authentication
-./setup-github-cli.sh     # GitHub CLI setup
-./setup-ssh-signing.sh    # SSH signing setup
-```
+-   **Git Commit Signing**: After setup, run `doctor.ps1` to check your Git signing status.
+-   **GitHub CLI**: The `gh` tool will use keys from the 1Password agent for authentication.
+-   **No Plaintext Secrets**: All sensitive data is managed through 1Password, never committed to the repository.
 
 ## 🆘 Troubleshooting
 
-**Setup failed?** The scripts are resumable:
-- Check `~/.dotfiles-setup.log` for detailed error logs
-- Simply run `./init.sh` again - it picks up where it left off
-- Use `./doctor.sh` to identify specific issues
-
-**Missing tools?** 
-- Run `brew bundle` to install missing Homebrew packages
-- Run `asdf install` to install missing development tools
-
-**Authentication issues?**
-- Ensure 1Password desktop app is running and SSH agent is enabled
-- Use setup scripts: `./setup-ssh-signing.sh` or `./setup-github-cli.sh`
-
----
-
-### 🚧 Future Enhancements Under Consideration
-**Modern ZSH Framework Alternatives:**
-- **[ZAP](https://github.com/zap-zsh/zap)**: Minimal, fast ZSH plugin manager as 
-alternative to Oh My Zsh
-- **[ZAP Supercharge](https://github.com/zap-zsh/supercharge)**: Enhanced ZSH experience 
-with auto-CD, interactive completions, and quality-of-life improvements
-- **[Powerlevel10k](https://github.com/romkatv/powerlevel10k)**: Ultra-fast, 
-feature-rich ZSH theme (framework-agnostic, works with current setup)
-- **Performance**: ZAP offers 3-5x faster startup times compared to Oh My Zsh while 
-maintaining compatibility with OMZ plugins
-
----
-
-This dotfiles repository is actively maintained and battle-tested across multiple development environments. The modular approach makes it easy to customize while keeping the core functionality robust.
-
-**Ready to explore your new environment?** → Read [`DEV-SETUP.md`](DEV-SETUP.md)
+-   **Script failed?** The `init.ps1` script is designed to be resumable. Simply run it again.
+-   **Missing icons in prompt?** Make sure you have set the font to `CaskaydiaCove NF` in your terminal's settings (Step 3 above).
+-   **Missing commands?** Close and restart your terminal. If that doesn't work, run `doctor.ps1` to diagnose the issue. 

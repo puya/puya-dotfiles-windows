@@ -1,7 +1,15 @@
-nodejs lts
-python 3.13.5
-poetry 2.1.3
-uv 0.7.15
-deno 2.4.0
-bun 1.2.17
+# .tool-versions
+# This file is managed by 'mise' (https://mise.jdx.dev)
+# Use 'mise install' to install these tool versions.
+# Use 'mise use <tool>@<version>' to set a new version.
+
+# --- Core Languages ---
+python 3.12.3
+nodejs lts # Installs the latest Long-Term Support version of Node.js
+
+# --- Additional Runtimes ---
+deno 1.44.4 # Using a specific version for stability
+bun 1.1.8
 rust latest
+# 'uv' is not yet available as a standalone mise plugin, 
+# but can be installed via pipx or npm if needed after python/node are set up. 

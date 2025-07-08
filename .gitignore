@@ -1,0 +1,9 @@
+# Ignore the logs directory
+logs/
+
+# Ignore user-specific local configurations
+.gitconfig.local
+
+# IDE-specific files
+.vscode/
+.idea/ 

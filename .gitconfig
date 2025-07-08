@@ -1,16 +1,5 @@
-[user]
-	name = Puya Khalili
-	email = pooya.khalili@gmail.com
-
-[commit]
-	gpgsign = true
-
-[gpg]
-	format = ssh
-
-[gpg "ssh"]
-	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
-	defaultKeyCommand = ssh-add -L
+# This is the main, machine-agnostic Git configuration.
+# It should only contain settings that are safe to share across all systems.
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
@@ -19,4 +8,6 @@
 	required = true
 
 [include]
-  path = ~/.gitconfig.local
+  # Include the machine-specific local configuration.
+  # This file is NOT committed to the repository.
+  path = ~/.gitconfig.local 
